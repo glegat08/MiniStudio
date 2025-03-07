@@ -6,6 +6,7 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(SOURCES
     ${SOURCE_DIR}/BehaviorTree.cpp
     ${SOURCE_DIR}/Enemy.cpp
+    ${SOURCE_DIR}/EnemyBT.cpp
     ${SOURCE_DIR}/Engine.cpp
     ${SOURCE_DIR}/Game.cpp
     ${SOURCE_DIR}/GameObject.cpp
@@ -22,6 +23,7 @@ set(SOURCES
 set(HEADERS
     ${HEADER_DIR}/BehaviorTree.h
     ${HEADER_DIR}/Enemy.h
+    ${HEADER_DIR}/EnemyBT.h
     ${HEADER_DIR}/Engine.h
     ${HEADER_DIR}/Game.h
     ${HEADER_DIR}/GameObject.h
