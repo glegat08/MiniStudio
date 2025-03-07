@@ -1,10 +1,9 @@
 #include "Engine.h"
-#include "Game.h"
 
-int main()
+int main(int argc, char* argv[])
 {
-	Engine* engine(1920, 1080, "Test");
-	Game game(engine);
+	SceneManager engine(1920, 1080, "Test");
+	Engine game(engine);
 
 	game.exec();
 

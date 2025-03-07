@@ -1,9 +1,13 @@
 #pragma once
-#include <SFML/Graphics.hpp>
+#include "SceneManager.h"
 
 class Engine
 {
 public:
-	Engine(sf::RenderWindow* window) {}
-	~Engine() = default;
+	Engine(SceneManager& scene);
+
+	void exec();
+
+private:
+	SceneManager* m_sceneManager;
 };
