@@ -1,4 +1,4 @@
-# MiniStudio
+# Mini Studio
 
 Hello,
 
