@@ -19,6 +19,7 @@ PRIVATE
     sfml-graphics
     sfml-window
     sfml-audio
+    sfml-system
 )
 
 add_custom_command(TARGET mainFile POST_BUILD

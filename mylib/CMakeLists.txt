@@ -50,6 +50,7 @@ PRIVATE
     sfml-graphics
     sfml-window
     sfml-audio
+    sfml-system
 )
 
 target_include_directories(${PROJECT_NAME}
