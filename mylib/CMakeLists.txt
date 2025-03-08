@@ -49,7 +49,6 @@ target_link_libraries(${PROJECT_NAME}
 PRIVATE
     sfml-graphics
     sfml-window
-    sfml_system
     sfml-audio
 )
 

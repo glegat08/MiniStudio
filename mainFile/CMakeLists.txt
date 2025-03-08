@@ -18,7 +18,6 @@ PUBLIC
 PRIVATE
     sfml-graphics
     sfml-window
-    sfml-system
     sfml-audio
 )
 
