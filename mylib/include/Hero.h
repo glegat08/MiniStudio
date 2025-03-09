@@ -10,6 +10,8 @@ public:
 
 	int getHp() override;
 	void getStat() override;
+	void processInput(const sf::Event& event) override;
+
 
 private:
 	int m_health;
@@ -21,7 +23,10 @@ private:
 private:
 	float m_speed;
 	float m_velocity;
-
+	bool m_isMovingUp;
+	bool m_isMovingDown;
+	bool m_isMovingLeft;	
+	bool m_isMovingRight;
 
 private:
 	HeroState m_stateManager;
