@@ -1,4 +1,5 @@
 #pragma once
+#include <SFML/Graphics.hpp>
 
 class Hero;
 
@@ -10,71 +11,100 @@ public:
 	virtual void update(Hero& hero, float deltaTime) = 0;
 	virtual void setTexture(Hero& hero) = 0;
 	virtual bool isTemporaryState() const;
+
+protected:
+	static bool isGoingUp();
+	static bool isGoingDown();
+	static bool isGoingLeft();
+	static bool isGoingRight();
+	static bool isDashing();
+	static bool canDash();
+	static bool isMeleAttacking();
+	static bool isRangeAttacking();
+
+	static void updateDirection(Hero& hero);
+
+	static bool m_dashAvailable;
+	static sf::Clock m_dashCooldownClock;
+	static const float m_dashCooldownDuration;
+
+	static bool m_mouseRightPressed;
+	static bool m_mouseLeftPressed;
 };
 
 class Idle : public IState
 {
 public:
-	void isDoingNothing(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isDoingNothing;
+
 };
 
 class Movement : public IState
 {
 public:
-	void isMoving(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isMovingUp;
-	bool m_isMovingDown;
-	bool m_isMovingLeft;
-	bool m_isMovingRight;
+	
 };
 
 class Attack : public IState
 {
 public:
-	void isAttacking(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isMeleAttack;
-	bool m_isRangeAttack;
+
 };
 
 class Block : public IState
 {
 public:
-	void isBlocking(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isBlocking;
+	
 };
 
 class Dash : public IState
 {
 public:
-	void isDashing(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isDashing;
+
 };
 
 class Hurt : public IState
 {
 public:
-	void isTackingDamage(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isTackingDamage;
+
 };
 
 class Death : public IState
 {
 public:
-	void isDead(const sf::Event& event);
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
 
 private:
-	bool m_isDead;
+
 };

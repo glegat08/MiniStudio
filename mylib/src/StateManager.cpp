@@ -3,46 +3,164 @@
 #include "StateManager.h"
 #include "hero.h"
 
-//bool IState::m_dashAvailable = true;
-//sf::Clock IState::m_dashCooldownClock;
-//const float IState::m_dashCooldownDuration = 2.0f;
-//bool IState::m_mouseLeftPressed = false;
+bool IState::m_dashAvailable = true;
+sf::Clock IState::m_dashCooldownClock;
+const float IState::m_dashCooldownDuration = 2.0f;
+bool IState::m_mouseRightPressed = false;
+bool IState::m_mouseLeftPressed = false;
 
-void Idle::isDoingNothing(const sf::Event& event)
+// ISTATE
+bool IState::isGoingUp()
 {
-    m_isDoingNothing = 0;
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Z);
 }
 
-void Movement::isMoving(const sf::Event& event)
+bool IState::isGoingDown()
 {
-    m_isMovingUp = sf::Keyboard::isKeyPressed(sf::Keyboard::Up);
-    m_isMovingDown = sf::Keyboard::isKeyPressed(sf::Keyboard::Down);
-    m_isMovingLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    m_isMovingRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    return sf::Keyboard::isKeyPressed((sf::Keyboard::S));
 }
 
-void Attack::isAttacking(const sf::Event& event)
+bool IState::isGoingLeft()
 {
-    m_isMeleAttack = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-    m_isRangeAttack = sf::Keyboard::isKeyPressed(sf::Keyboard::Z);
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Q);
 }
 
-void Block::isBlocking(const sf::Event& event)
+bool IState::isGoingRight()
 {
-    m_isBlocking = sf::Keyboard::isKeyPressed(sf::Keyboard::E);
+    return sf::Keyboard::isKeyPressed((sf::Keyboard::D));
 }
 
-void Dash::isDashing(const sf::Event& event)
+bool IState::isDashing()
 {
-    m_isDashing = sf::Keyboard::isKeyPressed(sf::Keyboard::Space);
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && canDash();
 }
 
-void Hurt::isTackingDamage(const sf::Event& event)
+bool IState::canDash()
+{
+    if (!m_dashAvailable && m_dashCooldownClock.getElapsedTime().asSeconds() >= m_dashCooldownDuration)
+        m_dashAvailable = true;
+
+    return m_dashAvailable;
+}
+
+bool IState::isMeleAttacking()
+{
+    bool currentPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+    bool result = currentPressed && !m_mouseLeftPressed;
+    m_mouseLeftPressed = currentPressed;
+    return result;
+}
+
+bool IState::isRangeAttacking()
+{
+    bool currentPressed = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+    bool result = currentPressed && !m_mouseRightPressed;
+    m_mouseRightPressed = currentPressed;
+    return result;
+}
+
+void IState::updateDirection(Hero& hero)
+{
+	
+}
+
+bool IState::isTemporaryState() const
+{
+    return false;
+}
+
+
+// IDLE STATE
+void Idle::handleInput(Hero& hero)
+{
+    
+}
+
+void Idle::update(Hero& hero, float deltaTime)
+{
+   
+}
+
+void Idle::setTexture(Hero& hero)
+{
+	
+}
+
+// ATTACK STATE
+void Attack::handleInput(Hero& hero)
+{
+    updateDirection(hero);
+}
+
+void Attack::update(Hero& hero, float deltaTime)
+{
+    
+}
+
+void Attack::setTexture(Hero& hero)
 {
 
 }
 
-void Death::isDead(const sf::Event& event)
+// MOVING STATE
+void Movement::handleInput(Hero& hero)
+{
+    
+}
+
+void Movement::update(Hero& hero, float deltaTime)
+{
+    
+}
+
+void Movement::setTexture(Hero& hero)
 {
 
+}
+
+// DASH STATE
+void Dash::handleInput(Hero& hero)
+{
+    
+}
+
+void Dash::update(Hero& hero, float deltaTime)
+{
+    
+}
+
+void Dash::setTexture(Hero& hero)
+{
+
+}
+
+// HURT STATE
+void Hurt::handleInput(Hero& hero)
+{
+    
+}
+
+void Hurt::update(Hero& hero, float deltaTime)
+{
+    
+}
+
+void Hurt::setTexture(Hero& hero)
+{
+    
+}
+
+// DEATH STATE
+void Death::handleInput(Hero& hero)
+{
+}
+
+void Death::update(Hero& hero, float deltaTime)
+{
+    
+}
+
+void Death::setTexture(Hero& hero)
+{
+    
 }
