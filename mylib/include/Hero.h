@@ -1,12 +1,30 @@
 #pragma once
 #include "GameObject.h"
+#include "HeroState.h"
 
 class HeroState;
+
+namespace HeroStateNames
+{
+	enum class stateName
+	{
+		idle,
+		move,
+		attack,
+		dash,
+		hurt,
+		death
+	};
+}
+
 
 class Hero : public IGameObject
 {
 public:
 	Hero();
+	~Hero() override = default;
+
+	using stateName = HeroStateNames::stateName;
 
 	int getHp() override;
 	void getStat() override;
