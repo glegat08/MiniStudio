@@ -86,22 +86,6 @@ void Idle::setTexture(Hero& hero)
 	
 }
 
-// ATTACK STATE
-void Attack::handleInput(Hero& hero)
-{
-    updateDirection(hero);
-}
-
-void Attack::update(Hero& hero, float deltaTime)
-{
-    
-}
-
-void Attack::setTexture(Hero& hero)
-{
-
-}
-
 // MOVING STATE
 void Movement::handleInput(Hero& hero)
 {
@@ -130,6 +114,22 @@ void Dash::update(Hero& hero, float deltaTime)
 }
 
 void Dash::setTexture(Hero& hero)
+{
+
+}
+
+// ATTACK STATE
+void Attack::handleInput(Hero& hero)
+{
+    updateDirection(hero);
+}
+
+void Attack::update(Hero& hero, float deltaTime)
+{
+
+}
+
+void Attack::setTexture(Hero& hero)
 {
 
 }

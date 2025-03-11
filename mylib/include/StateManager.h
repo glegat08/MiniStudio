@@ -65,17 +65,6 @@ private:
 
 };
 
-class Block : public IState
-{
-public:
-	void handleInput(Hero& hero) override;
-	void update(Hero& hero, float deltaTime) override;
-	void setTexture(Hero& hero) override;
-
-private:
-	
-};
-
 class Dash : public IState
 {
 public:
