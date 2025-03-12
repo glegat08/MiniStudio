@@ -1,5 +1,6 @@
 #include "HeroState.h"
 #include "Hero.h"
+#include <iostream>
 
 HeroState::HeroState() : m_currentState(nullptr), m_currentStateName(StateEnum::idle)
 {
@@ -26,6 +27,9 @@ HeroState::~HeroState()
 
 void HeroState::setState(Hero* hero, HeroStateNames::stateName newState)
 {
+    if (m_currentStateName == StateEnum::death && newState != StateEnum::death)
+        return;
+
     if (newState == StateEnum::death)
     {
         while (!m_stateStack.empty())
@@ -35,7 +39,9 @@ void HeroState::setState(Hero* hero, HeroStateNames::stateName newState)
     }
 
     if (m_states.find(newState) == m_states.end())
+    {
         return;
+    }
 
     m_currentState = m_states[newState];
     m_currentStateName = newState;
@@ -46,8 +52,13 @@ void HeroState::setState(Hero* hero, HeroStateNames::stateName newState)
 
 void HeroState::pushState(Hero* hero, HeroStateNames::stateName newState)
 {
-    if (m_states.find(newState) == m_states.end())
+    if (m_currentStateName == StateEnum::death)
         return;
+
+    if (m_states.find(newState) == m_states.end())
+    {
+        return;
+    }
 
     m_stateStack.push(std::make_pair(m_currentStateName, m_currentState));
 
@@ -61,7 +72,10 @@ void HeroState::pushState(Hero* hero, HeroStateNames::stateName newState)
 void HeroState::popState(Hero* hero)
 {
     if (m_stateStack.empty())
+    {
+        setState(hero, StateEnum::idle);
         return;
+    }
 
     auto previousState = m_stateStack.top();
     m_stateStack.pop();

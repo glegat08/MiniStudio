@@ -51,7 +51,7 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
-	
+
 };
 
 class Attack : public IState
