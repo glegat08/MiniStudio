@@ -1,5 +1,4 @@
 #include <SFML/Graphics.hpp>
-#include <iostream>
 #include <cmath>
 
 #include "StateManager.h"
@@ -10,15 +9,6 @@ sf::Clock IState::m_dashCooldownClock;
 const float IState::m_dashCooldownDuration = 2.0f;
 bool IState::m_mouseRightPressed = false;
 bool IState::m_mouseLeftPressed = false;
-
-const sf::Vector2f DIR_UP(0, -1);
-const sf::Vector2f DIR_DOWN(0, 1);
-const sf::Vector2f DIR_LEFT(-1, 0);
-const sf::Vector2f DIR_RIGHT(1, 0);
-const float DASH_SPEED_MULTIPLIER = 3.0f;
-const float DASH_DURATION = 0.35f;
-const float ATTACK_DURATION = 0.5f;
-const float HURT_DURATION = 0.7f;
 
 // ISTATE
 bool IState::isGoingUp()
@@ -98,9 +88,15 @@ void Idle::handleInput(Hero& hero)
         return;
     }
 
-    if (isMeleAttacking() || isRangeAttacking()) 
+    if (isMeleAttacking())
     {
-        hero.pushState(HeroStateNames::stateName::attack);
+        hero.pushState(HeroStateNames::stateName::mele_attack);
+        return;
+    }
+
+    if (isRangeAttacking())
+    {
+        hero.pushState(HeroStateNames::stateName::range_attack);
         return;
     }
 
@@ -121,13 +117,13 @@ void Idle::update(Hero& hero, float deltaTime)
         m_elapsedTime.restart();
 
         sf::IntRect frameRect(m_currentFrame * m_frameWidth, 0, m_frameWidth, m_frameHeight);
-        //hero.getSprite().setTextureRect(frameRect);
+        hero.getSprite().setTextureRect(frameRect);
     }
 }
 
 void Idle::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::idle));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::idle));
 }
 
 // MOVING STATE
@@ -141,9 +137,15 @@ void Movement::handleInput(Hero& hero)
         return;
     }
 
-    if (isMeleAttacking() || isRangeAttacking()) 
+    if (isMeleAttacking())
     {
-        hero.pushState(HeroStateNames::stateName::attack);
+        hero.pushState(HeroStateNames::stateName::mele_attack);
+        return;
+    }
+
+    if (isRangeAttacking())
+    {
+        hero.pushState(HeroStateNames::stateName::range_attack);
         return;
     }
 
@@ -154,6 +156,28 @@ void Movement::handleInput(Hero& hero)
     }
 
     updateDirection(hero);
+}
+
+sf::Vector2f Movement::calculateMovementDirection()
+{
+    sf::Vector2f direction(0, 0);
+
+    if (isGoingUp())
+        direction.y -= 1;
+    if (isGoingDown())
+        direction.y += 1;
+    if (isGoingLeft())
+        direction.x -= 1;
+    if (isGoingRight())
+        direction.x += 1;
+
+    if (direction.x != 0 || direction.y != 0)
+    {
+        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+        direction /= length;
+    }
+
+    return direction;
 }
 
 void Movement::update(Hero& hero, float deltaTime)
@@ -169,13 +193,35 @@ void Movement::update(Hero& hero, float deltaTime)
 
 void Movement::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::move));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::move));
 }
 
 // DASH STATE
 void Dash::handleInput(Hero& hero)
 {
     updateDirection(hero);
+}
+
+sf::Vector2f Dash::calculateMovementDirection()
+{
+    sf::Vector2f direction(0, 0);
+
+    if (isGoingUp())
+        direction.y -= 1;
+    if (isGoingDown())
+        direction.y += 1;
+    if (isGoingLeft())
+        direction.x -= 1;
+    if (isGoingRight())
+        direction.x += 1;
+
+    if (direction.x != 0 || direction.y != 0)
+    {
+        float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+        direction /= length;
+    }
+
+    return direction;
 }
 
 void Dash::update(Hero& hero, float deltaTime)
@@ -193,7 +239,7 @@ void Dash::update(Hero& hero, float deltaTime)
         IState::m_dashCooldownClock.restart();
     }
 
-    float dashSpeed = hero.getSpeed() * DASH_SPEED_MULTIPLIER;
+    float dashSpeed = hero.getSpeed() * m_dashSpeed;
     hero.move(m_dashDirection * dashSpeed * deltaTime);
 
     if (m_elapsedTime.getElapsedTime().asSeconds() >= m_dashDuration)
@@ -205,26 +251,45 @@ void Dash::update(Hero& hero, float deltaTime)
 
 void Dash::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::dash));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::dash));
 }
 
 // ATTACK STATE
-void Attack::handleInput(Hero& hero)
+void MeleAttack::handleInput(Hero& hero)
 {
     updateDirection(hero);
 }
 
-void Attack::update(Hero& hero, float deltaTime)
+void MeleAttack::update(Hero& hero, float deltaTime)
 {
-    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_attackDuration) 
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_meleAttackDuration)
     {
         hero.popState();
     }
 }
 
-void Attack::setTexture(Hero& hero)
+void MeleAttack::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::attack));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::mele_attack));
+}
+
+// ATTACK STATE
+void RangeAttack::handleInput(Hero& hero)
+{
+    updateDirection(hero);
+}
+
+void RangeAttack::update(Hero& hero, float deltaTime)
+{
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_rangeAttackDuration)
+    {
+        hero.popState();
+    }
+}
+
+void RangeAttack::setTexture(Hero& hero)
+{
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::range_attack));
 }
 
 // HURT STATE
@@ -250,7 +315,7 @@ void Hurt::update(Hero& hero, float deltaTime)
 
 void Hurt::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::hurt));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::hurt));
 }
 
 // DEATH STATE
@@ -268,5 +333,5 @@ void Death::update(Hero& hero, float deltaTime)
 
 void Death::setTexture(Hero& hero)
 {
-    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::death));
+    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::death));
 }

@@ -1,7 +1,7 @@
 #include <iostream>
 
 #include "Hero.h"
-#include "TextureManager.h"
+#include "PathManager.h"
 
 Hero::Hero()
 {
@@ -120,6 +120,13 @@ void Hero::setIdle(bool idle)
     }
 }
 
+void Hero::setState(stateName newState)
+{
+    m_currentStateName = newState;
+    m_stateManager.setState(this, newState);
+    m_sprites.setTexture(m_textures[newState]);
+}
+
 void Hero::pushState(stateName newState)
 {
     m_stateManager.pushState(this, newState);
@@ -155,27 +162,75 @@ HeroState& Hero::getStateManager()
 
 void Hero::setStateTexture()
 {
-    /*m_textures[stateName::idle].loadFromFile(PathManager::getResourcePath("hero\\IDLE.png"));
-    m_textures[stateName::move].loadFromFile(PathManager::getResourcePath("hero\\MOVE.png"));
-    m_textures[stateName::dash].loadFromFile(PathManager::getResourcePath("hero\\DASH.png"));
-    m_textures[stateName::mele_attack].loadFromFile(PathManager::getResourcePath("hero\\MELEATTACK.png"));
-    m_textures[stateName::range_attack].loadFromFile(PathManager::getResourcePath("hero\\RANGEATTACK.png"));
-    m_textures[stateName::hurt].loadFromFile(PathManager::getResourcePath("hero\\HURT.png"));
-    m_textures[stateName::death].loadFromFile(PathManager::getResourcePath("hero\\DEATH.png"));*/
+    m_textures[stateName::idle].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::move].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::dash].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::mele_attack].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::range_attack].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::hurt].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
+    m_textures[stateName::death].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
 }
 
 sf::FloatRect Hero::getHitbox() const
 {
-    //return getGlobalBounds();
+    sf::FloatRect spriteRect = m_sprites.getGlobalBounds();
+    float width, height, offsetX, y;
+
+    // IDLE STATE
+    width = spriteRect.width * 0.2f;
+    height = spriteRect.height * 1.0f;
+
+    if (m_isIdle)
+        offsetX = spriteRect.width * 0.75f;
+    else
+        offsetX = spriteRect.width * 0.05f;
+
+    y = spriteRect.top + (spriteRect.height - height) * 0.35f;
+
+    switch (m_currentStateName)
+    {
+    case stateName::move:
+        width = spriteRect.width * 0.3f;
+        if (m_isMoving)
+            offsetX = spriteRect.width * 0.65f;
+        else
+            offsetX = spriteRect.width * 0.05f;
+        break;
+    case stateName::mele_attack:
+        width = spriteRect.width * 0.47f;
+        if (m_isMeleAttacking)
+            offsetX = spriteRect.width * 0.47f;
+        else
+            offsetX = spriteRect.width * 0.05f;
+        break;
+    case stateName::range_attack:
+        width = spriteRect.width * 0.54f;
+        if (m_isRangeAttacking)
+            offsetX = spriteRect.width * 0.4f;
+        else
+            offsetX = spriteRect.width * 0.05f;
+        break;
+    case stateName::dash:
+        width = spriteRect.width * 0.5f;
+        if (m_isDashing)
+            offsetX = spriteRect.width * 0.45f;
+        else
+            offsetX = spriteRect.width * 0.05f;
+        break;
+    
+    }
+
+    float x = spriteRect.left + offsetX;
+
+    return sf::FloatRect(x, y, width, height);
 }
 
 sf::Vector2f Hero::getPlayerPosition()
 {
-    //return getPosition();
+    return m_sprites.getPosition();
 }
 
 sf::Vector2f Hero::getPlayerCenter()
 {
-    sf::FloatRect bounds = getHitbox();
-    return sf::Vector2f(bounds.left + bounds.width / 2, bounds.top + bounds.height / 2);
+    return { getHitbox().left + getHitbox().width / 2.f, getHitbox().top + getHitbox().height / 2.f };
 }

@@ -41,11 +41,11 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	float m_frameTime;
-	int m_currentFrame;
-	int m_frameCount;
-	const int m_frameWidth;
-	const int m_frameHeight;
+	float m_frameTime = 0.5f;
+	int m_currentFrame = 1;
+	int m_frameCount = 2;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
 };
 
 class Movement : public IState
@@ -54,12 +54,18 @@ public:
 	void handleInput(Hero& hero) override;
 	void update(Hero& hero, float deltaTime) override;
 	void setTexture(Hero& hero) override;
+	sf::Vector2f calculateMovementDirection();
 
 private:
-
+	sf::Clock m_elapsedTime;
+	const float m_frameTime = 0.03f;
+	int m_currentFrame = 2;
+	const int m_frameCount = 2;
+	const int m_frameWidth = 96;
+	const int m_frameHeight = 34;
 };
 
-class Attack : public IState
+class MeleAttack : public IState
 {
 public:
 	void handleInput(Hero& hero) override;
@@ -68,12 +74,29 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	float m_frameTime;
-	int m_currentFrame;
-	int m_frameCount;
-	const int m_frameWidth;
-	const int m_frameHeight;
-	const float m_attackDuration;
+	float m_frameTime = 0.08f;
+	int m_currentFrame = 9;
+	int m_frameCount = 6;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
+	const float m_meleAttackDuration = 0.5f;
+};
+
+class RangeAttack : public IState
+{
+public:
+	void handleInput(Hero& hero) override;
+	void update(Hero& hero, float deltaTime) override;
+	void setTexture(Hero& hero) override;
+
+private:
+	sf::Clock m_elapsedTime;
+	float m_frameTime = 0.08f;
+	int m_currentFrame = 5;
+	int m_frameCount = 4;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
+	const float m_rangeAttackDuration = 0.5f;
 };
 
 class Dash : public IState
@@ -82,16 +105,17 @@ public:
 	void handleInput(Hero& hero) override;
 	void update(Hero& hero, float deltaTime) override;
 	void setTexture(Hero& hero) override;
+	sf::Vector2f calculateMovementDirection();
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime;
-	int m_currentFrame;
-	const int m_frameCount;
-	const int m_frameWidth;
-	const int m_frameHeight;
-	const float m_dashSpeed;
-	const float m_dashDuration;
+	const float m_frameTime = 0.08f;
+	int m_currentFrame = 2;
+	const int m_frameCount = 1;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
+	const float m_dashSpeed = 250.f;
+	const float m_dashDuration = 0.01f;
 	sf::Vector2f m_dashDirection;
 };
 
@@ -104,12 +128,12 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime;
-	int m_currentFrame;
-	const int m_frameCount;
-	const int m_frameWidth;
-	const int m_frameHeight;
-	const float m_hurtDuration;
+	const float m_frameTime = 0.2f;
+	int m_currentFrame = 60;
+	const int m_frameCount = 1;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
+	const float m_hurtDuration = 0.5f;
 };
 
 class Death : public IState
@@ -121,12 +145,12 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime;
-	int m_currentFrame;
-	const int m_frameCount;
-	const int m_frameWidth;
-	const int m_frameHeight;
-	const float m_deathDuration;
+	const float m_frameTime = 0.2f;
+	int m_currentFrame = 43;
+	const int m_frameCount = 18;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
+	const float m_deathDuration = 2.f;
 
 	bool m_animationComplete = false;
 };

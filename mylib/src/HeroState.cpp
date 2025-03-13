@@ -1,12 +1,12 @@
 #include "HeroState.h"
 #include "Hero.h"
-#include <iostream>
 
 HeroState::HeroState() : m_currentState(nullptr), m_currentStateName(StateEnum::idle)
 {
     m_states[StateEnum::idle] = std::make_shared<Idle>();
     m_states[StateEnum::move] = std::make_shared<Movement>();
-    m_states[StateEnum::attack] = std::make_shared<Attack>();
+    m_states[StateEnum::mele_attack] = std::make_shared<MeleAttack>();
+    m_states[StateEnum::range_attack] = std::make_shared<RangeAttack>();
     m_states[StateEnum::dash] = std::make_shared<Dash>();
     m_states[StateEnum::hurt] = std::make_shared<Hurt>();
     m_states[StateEnum::death] = std::make_shared<Death>();

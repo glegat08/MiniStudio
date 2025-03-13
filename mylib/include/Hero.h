@@ -46,6 +46,7 @@ public:
 	float getSpeed() const;
 	void move(const sf::Vector2f& offset);
 	void setIdle(bool idle);
+	void setState(stateName newState);
 	void pushState(stateName newState);
 	void popState();
 
@@ -60,6 +61,8 @@ public:
 	sf::Vector2f getPlayerPosition();
 	sf::Vector2f getPlayerCenter();
 
+
+
 protected:
 	int m_health;
 	int m_armor;
@@ -71,7 +74,10 @@ protected:
 	float m_velocity;
 
 	bool m_isIdle;
-	bool m_isAttacking;
+	bool m_isMoving;
+	bool m_isDashing;
+	bool m_isMeleAttacking;
+	bool m_isRangeAttacking;
 	bool m_isHurt = false;
 	bool m_isDead = false;
 
