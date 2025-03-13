@@ -79,7 +79,6 @@ sf::Vector2f calculateMovementDirection()
     if (IState::isGoingLeft()) direction += DIR_LEFT;
     if (IState::isGoingRight()) direction += DIR_RIGHT;
 
-    // Normalize the vector if it's not zero
     float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
     if (length > 0) 
     {
@@ -134,12 +133,19 @@ void Idle::handleInput(Hero& hero)
 
 void Idle::update(Hero& hero, float deltaTime)
 {
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_frameTime)
+    {
+        m_currentFrame = (m_currentFrame + 1) % m_frameCount;
+        m_elapsedTime.restart();
 
+        sf::IntRect frameRect(m_currentFrame * m_frameWidth, 0, m_frameWidth, m_frameHeight);
+        //hero.getSprite().setTextureRect(frameRect);
+    }
 }
 
 void Idle::setTexture(Hero& hero)
 {
-
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::idle));
 }
 
 // MOVING STATE
@@ -181,13 +187,10 @@ void Movement::update(Hero& hero, float deltaTime)
 
 void Movement::setTexture(Hero& hero)
 {
-    
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::move));
 }
 
 // DASH STATE
-static sf::Clock dashTimer;
-static sf::Vector2f dashDirection;
-
 void Dash::handleInput(Hero& hero)
 {
     updateDirection(hero);
@@ -195,13 +198,13 @@ void Dash::handleInput(Hero& hero)
 
 void Dash::update(Hero& hero, float deltaTime)
 {
-    if (dashTimer.getElapsedTime().asSeconds() < 0.001f) 
+    if (m_elapsedTime.getElapsedTime().asSeconds() < 0.001f)
     {
-        dashDirection = calculateMovementDirection();
+        m_dashDirection = calculateMovementDirection();
 
-        if (dashDirection.x == 0 && dashDirection.y == 0) 
+        if (m_dashDirection.x == 0 && m_dashDirection.y == 0)
         {
-            dashDirection = sf::Vector2f(1, 0);
+            m_dashDirection = sf::Vector2f(1, 0);
         }
 
         IState::m_dashAvailable = false;
@@ -209,23 +212,21 @@ void Dash::update(Hero& hero, float deltaTime)
     }
 
     float dashSpeed = hero.getSpeed() * DASH_SPEED_MULTIPLIER;
-    hero.move(dashDirection * dashSpeed * deltaTime);
+    hero.move(m_dashDirection * dashSpeed * deltaTime);
 
-    if (dashTimer.getElapsedTime().asSeconds() >= DASH_DURATION) 
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_dashDuration)
     {
         hero.popState();
-        dashTimer.restart();
+        m_elapsedTime.restart();
     }
 }
 
 void Dash::setTexture(Hero& hero)
 {
-
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::dash));
 }
 
 // ATTACK STATE
-static sf::Clock attackTimer;
-
 void Attack::handleInput(Hero& hero)
 {
     updateDirection(hero);
@@ -233,7 +234,7 @@ void Attack::handleInput(Hero& hero)
 
 void Attack::update(Hero& hero, float deltaTime)
 {
-    if (attackTimer.getElapsedTime().asSeconds() >= ATTACK_DURATION) 
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_attackDuration) 
     {
         hero.popState();
     }
@@ -241,21 +242,25 @@ void Attack::update(Hero& hero, float deltaTime)
 
 void Attack::setTexture(Hero& hero)
 {
-
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::attack));
 }
 
 // HURT STATE
-static sf::Clock hurtTimer;
-
 void Hurt::handleInput(Hero& hero)
 {
-
+    if (!hero.isInvulnerable())
+    {
+        if (isGoingUp() || isGoingDown() || isGoingLeft() || isGoingRight())
+            hero.pushState(HeroStateNames::stateName::move);
+        else
+            hero.pushState(HeroStateNames::stateName::idle);
+    }
 }
 
 void Hurt::update(Hero& hero, float deltaTime)
 {
     
-    if (hurtTimer.getElapsedTime().asSeconds() >= HURT_DURATION) 
+    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_hurtDuration) 
     {
         hero.popState();
     }
@@ -263,27 +268,23 @@ void Hurt::update(Hero& hero, float deltaTime)
 
 void Hurt::setTexture(Hero& hero)
 {
-
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::hurt));
 }
 
 // DEATH STATE
-static bool deathAnimationComplete = false;
-static sf::Clock deathTimer;
-const float DEATH_ANIMATION_DURATION = 2.0f;
-
 void Death::handleInput(Hero& hero)
 {
-    
 }
 
 void Death::update(Hero& hero, float deltaTime)
 {
-    if (!deathAnimationComplete && deathTimer.getElapsedTime().asSeconds() >= DEATH_ANIMATION_DURATION) {
-        deathAnimationComplete = true;
+    if (!m_animationComplete && m_elapsedTime.getElapsedTime().asSeconds() >= m_deathDuration) 
+    {
+        m_animationComplete = true;
     }
 }
 
 void Death::setTexture(Hero& hero)
 {
-    
+    //hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::death));
 }

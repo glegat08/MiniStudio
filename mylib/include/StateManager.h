@@ -21,6 +21,7 @@ protected:
 	static bool canDash();
 	static bool isMeleAttacking();
 	static bool isRangeAttacking();
+	sf::Vector2f calculateMovementDirection();
 
 	static void updateDirection(Hero& hero);
 
@@ -40,7 +41,12 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
-
+	sf::Clock m_elapsedTime;
+	float m_frameTime;
+	int m_currentFrame;
+	int m_frameCount;
+	const int m_frameWidth;
+	const int m_frameHeight;
 };
 
 class Movement : public IState
@@ -62,7 +68,13 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
-
+	sf::Clock m_elapsedTime;
+	float m_frameTime;
+	int m_currentFrame;
+	int m_frameCount;
+	const int m_frameWidth;
+	const int m_frameHeight;
+	const float m_attackDuration;
 };
 
 class Dash : public IState
@@ -73,7 +85,15 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
-
+	sf::Clock m_elapsedTime;
+	const float m_frameTime;
+	int m_currentFrame;
+	const int m_frameCount;
+	const int m_frameWidth;
+	const int m_frameHeight;
+	const float m_dashSpeed;
+	const float m_dashDuration;
+	sf::Vector2f m_dashDirection;
 };
 
 class Hurt : public IState
@@ -84,7 +104,13 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
-
+	sf::Clock m_elapsedTime;
+	const float m_frameTime;
+	int m_currentFrame;
+	const int m_frameCount;
+	const int m_frameWidth;
+	const int m_frameHeight;
+	const float m_hurtDuration;
 };
 
 class Death : public IState
@@ -95,5 +121,13 @@ public:
 	void setTexture(Hero& hero) override;
 
 private:
+	sf::Clock m_elapsedTime;
+	const float m_frameTime;
+	int m_currentFrame;
+	const int m_frameCount;
+	const int m_frameWidth;
+	const int m_frameHeight;
+	const float m_deathDuration;
 
+	bool m_animationComplete = false;
 };
