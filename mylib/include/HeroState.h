@@ -28,6 +28,8 @@ public:
     void handleInput(Hero& hero);
     void update(Hero& hero, float deltaTime);
 
+    bool isStateStackEmpty() const { return m_stateStack.empty(); }
+
 private:
     std::map<StateEnum, std::shared_ptr<IState>> m_states;
     std::shared_ptr<IState> m_currentState;

@@ -58,11 +58,11 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime = 0.03f;
-	int m_currentFrame = 2;
+	const float m_frameTime = 0.2f;
+	int m_currentFrame = 3;
 	const int m_frameCount = 2;
-	const int m_frameWidth = 96;
-	const int m_frameHeight = 34;
+	const int m_frameWidth = 32;
+	const int m_frameHeight = 32;
 };
 
 class MeleAttack : public IState
@@ -74,12 +74,12 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	float m_frameTime = 0.08f;
+	float m_frameTime = 0.1f;
 	int m_currentFrame = 9;
 	int m_frameCount = 6;
 	const int m_frameWidth = 32;
 	const int m_frameHeight = 32;
-	const float m_meleAttackDuration = 0.5f;
+	const float m_meleAttackDuration = 0.6f;
 };
 
 class RangeAttack : public IState
@@ -91,12 +91,12 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	float m_frameTime = 0.08f;
+	float m_frameTime = 0.1f;
 	int m_currentFrame = 5;
 	int m_frameCount = 4;
 	const int m_frameWidth = 32;
 	const int m_frameHeight = 32;
-	const float m_rangeAttackDuration = 0.5f;
+	const float m_rangeAttackDuration = 0.4f;
 };
 
 class Dash : public IState
@@ -109,13 +109,13 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime = 0.08f;
+	const float m_frameTime = 1.f;
 	int m_currentFrame = 2;
 	const int m_frameCount = 1;
 	const int m_frameWidth = 32;
 	const int m_frameHeight = 32;
 	const float m_dashSpeed = 250.f;
-	const float m_dashDuration = 0.01f;
+	const float m_dashDuration = 1.f;
 	sf::Vector2f m_dashDirection;
 };
 
@@ -128,7 +128,7 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime = 0.2f;
+	const float m_frameTime = 0.5f;
 	int m_currentFrame = 60;
 	const int m_frameCount = 1;
 	const int m_frameWidth = 32;
@@ -145,7 +145,7 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime = 0.2f;
+	const float m_frameTime = 0.75f;
 	int m_currentFrame = 43;
 	const int m_frameCount = 18;
 	const int m_frameWidth = 32;
