@@ -54,7 +54,6 @@ public:
 	void handleInput(Hero& hero) override;
 	void update(Hero& hero, float deltaTime) override;
 	void setTexture(Hero& hero) override;
-	sf::Vector2f calculateMovementDirection();
 
 private:
 	sf::Clock m_elapsedTime;
@@ -105,7 +104,6 @@ public:
 	void handleInput(Hero& hero) override;
 	void update(Hero& hero, float deltaTime) override;
 	void setTexture(Hero& hero) override;
-	sf::Vector2f calculateMovementDirection();
 
 private:
 	sf::Clock m_elapsedTime;

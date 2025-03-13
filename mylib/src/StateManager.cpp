@@ -18,7 +18,7 @@ bool IState::isGoingUp()
 
 bool IState::isGoingDown()
 {
-    return sf::Keyboard::isKeyPressed((sf::Keyboard::S));
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::S);
 }
 
 bool IState::isGoingLeft()
@@ -28,12 +28,12 @@ bool IState::isGoingLeft()
 
 bool IState::isGoingRight()
 {
-    return sf::Keyboard::isKeyPressed((sf::Keyboard::D));
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::D);
 }
 
 bool IState::isDashing()
 {
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::Space) && canDash();
+    return sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && canDash();
 }
 
 bool IState::canDash()
@@ -46,7 +46,7 @@ bool IState::canDash()
 
 bool IState::isMeleAttacking()
 {
-    bool currentPressed = sf::Mouse::isButtonPressed(sf::Mouse::Left);
+    bool currentPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
     bool result = currentPressed && !m_mouseLeftPressed;
     m_mouseLeftPressed = currentPressed;
     return result;
@@ -54,7 +54,7 @@ bool IState::isMeleAttacking()
 
 bool IState::isRangeAttacking()
 {
-    bool currentPressed = sf::Mouse::isButtonPressed(sf::Mouse::Right);
+    bool currentPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::E);
     bool result = currentPressed && !m_mouseRightPressed;
     m_mouseRightPressed = currentPressed;
     return result;

@@ -64,14 +64,14 @@ public:
 
 
 protected:
-	int m_health;
-	int m_armor;
-	int m_strength;
-	int m_mana;
-	int m_stamina;
+	int m_health = 10;
+	int m_armor = 10;
+	int m_strength = 10;
+	int m_mana = 10;
+	int m_stamina = 10;
 
-	float m_speed;
-	float m_velocity;
+	float m_speed = 70.f;
+	float m_velocity = 0.5f;
 
 	bool m_isIdle;
 	bool m_isMoving;
