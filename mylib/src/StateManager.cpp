@@ -70,24 +70,6 @@ bool IState::isRangeAttacking()
     return result;
 }
 
-sf::Vector2f calculateMovementDirection()
-{
-    sf::Vector2f direction(0, 0);
-
-    if (IState::isGoingUp()) direction += DIR_UP;
-    if (IState::isGoingDown()) direction += DIR_DOWN;
-    if (IState::isGoingLeft()) direction += DIR_LEFT;
-    if (IState::isGoingRight()) direction += DIR_RIGHT;
-
-    float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    if (length > 0) 
-    {
-        direction /= length;
-    }
-
-    return direction;
-}
-
 void IState::updateDirection(Hero& hero)
 {
     sf::Vector2i mousePos = sf::Mouse::getPosition(); 

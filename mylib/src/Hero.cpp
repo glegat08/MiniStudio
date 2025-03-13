@@ -1,19 +1,12 @@
 #include <iostream>
 
 #include "Hero.h"
+#include "TextureManager.h"
 
 Hero::Hero()
-    : m_health(100)
-    , m_armor(10)
-    , m_strength(15)
-    , m_mana(50)
-    , m_stamina(100)
-    , m_speed(200.0f)
-    , m_velocity(0.0f)
 {
-    setPosition(sf::Vector2f(400.0f, 300.0f));
-
-    m_stateManager.setState(this, HeroStateNames::stateName::idle);
+    setStateTexture();
+	m_sprites.setScale(2.f, 2.f);
 }
 
 bool Hero::isAlive()
@@ -21,14 +14,14 @@ bool Hero::isAlive()
     return m_health > 0;
 }
 
-bool Hero::isShooting()
+bool Hero::isMeleAttacking()
 {
-    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::attack;
+    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::mele_attack;
 }
 
-bool Hero::isAttacking()
+bool Hero::isRangeAttacking()
 {
-    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::attack;
+	return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::range_attack;
 }
 
 bool Hero::isInvulnerable()
@@ -62,17 +55,25 @@ void Hero::takeDamage(int damage)
 
 void Hero::setInvulnerable(float duration)
 {
-    m_stateManager.setState(this, HeroStateNames::stateName::hurt);
+    m_isInvulnerable = true;
+    m_invulnerabilityTimer.restart();
+    m_invulnerabilityDuration = duration;
 }
 
 void Hero::updateInvulnerabilityEffect()
 {
-    
+    if (m_isInvulnerable && m_invulnerabilityTimer.getElapsedTime().asSeconds() >= m_invulnerabilityDuration)
+        m_isInvulnerable = false;   
 }
 
-void Hero::attacking()
+void Hero::meleAttacking()
 {
-    m_stateManager.setState(this, HeroStateNames::stateName::attack);
+    m_stateManager.setState(this, HeroStateNames::stateName::mele_attack);
+}
+
+void Hero::rangeAttacking()
+{
+    m_stateManager.setState(this, HeroStateNames::stateName::range_attack);
 }
 
 void Hero::handleInput()
@@ -82,17 +83,8 @@ void Hero::handleInput()
 
 void Hero::update(float deltaTime)
 {
+    updateInvulnerabilityEffect();
     m_stateManager.update(*this, deltaTime);
-
-    if (m_stateManager.getCurrentState()->isTemporaryState())
-    {
-        
-    }
-
-    if (isInvulnerable())
-    {
-        updateInvulnerabilityEffect();
-    }
 }
 
 void Hero::setSpeed(float speed)
@@ -100,10 +92,24 @@ void Hero::setSpeed(float speed)
     m_speed = speed;
 }
 
+int Hero::getHp()
+{
+    return m_health;
+}
+
+int Hero::getStrenght() const
+{
+    return m_strength;
+}
+
+float Hero::getSpeed() const
+{
+    return m_speed;
+}
+
 void Hero::move(const sf::Vector2f& offset)
 {
-    sf::Vector2f currentPos = getPosition();
-    setPosition(currentPos + offset);
+    m_sprites.move(offset);
 }
 
 void Hero::setIdle(bool idle)
@@ -124,30 +130,48 @@ void Hero::popState()
     m_stateManager.popState(this);
 }
 
-int Hero::getHp()
+sf::Texture& Hero::getTexture(const stateName& stateName_)
 {
-    return m_health;
+    if (m_textures.find(stateName_) == m_textures.end())
+        return m_textures[stateName::idle];
+
+    return m_textures[stateName_];
 }
 
-void Hero::getStat()
+sf::Sprite& Hero::getSprite()
 {
-    std::cout << "Hero Stats:" << std::endl;
-    std::cout << "HP: " << m_health << std::endl;
-    std::cout << "Armor: " << m_armor << std::endl;
-    std::cout << "Strength: " << m_strength << std::endl;
-    std::cout << "Mana: " << m_mana << std::endl;
-    std::cout << "Stamina: " << m_stamina << std::endl;
-    std::cout << "Speed: " << m_speed << std::endl;
+    return m_sprites;
+}
+
+Hero::stateName Hero::getCurrentState() const
+{
+    return m_currentStateName;
+}
+
+HeroState& Hero::getStateManager()
+{
+    return m_stateManager;
+}
+
+void Hero::setStateTexture()
+{
+    /*m_textures[stateName::idle].loadFromFile(PathManager::getResourcePath("hero\\IDLE.png"));
+    m_textures[stateName::move].loadFromFile(PathManager::getResourcePath("hero\\MOVE.png"));
+    m_textures[stateName::dash].loadFromFile(PathManager::getResourcePath("hero\\DASH.png"));
+    m_textures[stateName::mele_attack].loadFromFile(PathManager::getResourcePath("hero\\MELEATTACK.png"));
+    m_textures[stateName::range_attack].loadFromFile(PathManager::getResourcePath("hero\\RANGEATTACK.png"));
+    m_textures[stateName::hurt].loadFromFile(PathManager::getResourcePath("hero\\HURT.png"));
+    m_textures[stateName::death].loadFromFile(PathManager::getResourcePath("hero\\DEATH.png"));*/
 }
 
 sf::FloatRect Hero::getHitbox() const
 {
-    return getGlobalBounds();
+    //return getGlobalBounds();
 }
 
 sf::Vector2f Hero::getPlayerPosition()
 {
-    return getPosition();
+    //return getPosition();
 }
 
 sf::Vector2f Hero::getPlayerCenter()

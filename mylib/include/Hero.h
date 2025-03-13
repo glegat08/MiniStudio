@@ -10,7 +10,8 @@ namespace HeroStateNames
 	{
 		idle,
 		move,
-		attack,
+		mele_attack,
+		range_attack,
 		dash,
 		hurt,
 		death
@@ -27,47 +28,60 @@ public:
 	using stateName = HeroStateNames::stateName;
 
 	bool isAlive();
-	bool isShooting();
-	bool isAttacking();
+	bool isMeleAttacking();
+	bool isRangeAttacking();
 	bool isInvulnerable();
 	bool isIdle() const;
 
 	void takeDamage(int damage);
 	void setInvulnerable(float duration);
 	void updateInvulnerabilityEffect();
-	void attacking();
+	void meleAttacking();
+	void rangeAttacking();
 	void handleInput();
 	void update(float deltaTime);
 	void setSpeed(float speed);
+	int getStrenght() const;
+	int getHp() override;
 	float getSpeed() const;
 	void move(const sf::Vector2f& offset);
 	void setIdle(bool idle);
 	void pushState(stateName newState);
 	void popState();
 
-	int getHp() override;
-	void getStat() override;
+	sf::Texture& getTexture(const stateName& stateName_);
+	sf::Sprite& getSprite();
+	stateName getCurrentState() const;
+	HeroState& getStateManager();
+
+	void setStateTexture();
 
 	sf::FloatRect getHitbox() const;
 	sf::Vector2f getPlayerPosition();
 	sf::Vector2f getPlayerCenter();
 
-	sf::Vector2f getPosition() const;
-	void setPosition(const sf::Vector2f& position);
-	sf::FloatRect getGlobalBounds() const;
-
-private:
+protected:
 	int m_health;
 	int m_armor;
 	int m_strength;
 	int m_mana;
 	int m_stamina;
 
-private:
 	float m_speed;
 	float m_velocity;
 
+	bool m_isIdle;
+	bool m_isAttacking;
+	bool m_isHurt = false;
+	bool m_isDead = false;
 
-private:
+protected:
+	bool m_isInvulnerable = false;
+	sf::Clock m_invulnerabilityTimer;
+	float m_invulnerabilityDuration = 0.f;
+
+	sf::Sprite m_sprites;
+	std::map<stateName, sf::Texture> m_textures;
 	HeroState m_stateManager;
+	stateName m_currentStateName;
 };

@@ -21,7 +21,6 @@ protected:
 	static bool canDash();
 	static bool isMeleAttacking();
 	static bool isRangeAttacking();
-	sf::Vector2f calculateMovementDirection();
 
 	static void updateDirection(Hero& hero);
 
