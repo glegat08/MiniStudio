@@ -5,6 +5,9 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(SOURCES
     ${SOURCE_DIR}/BehaviorTree.cpp
+    ${SOURCE_DIR}/Camera.cpp
+    ${SOURCE_DIR}/Component.cpp
+    ${SOURCE_DIR}/Composite.cpp
     ${SOURCE_DIR}/Enemy.cpp
     ${SOURCE_DIR}/EnemyBT.cpp
     ${SOURCE_DIR}/Engine.cpp
@@ -12,6 +15,7 @@ set(SOURCES
     ${SOURCE_DIR}/GameObject.cpp
     ${SOURCE_DIR}/Hero.cpp
     ${SOURCE_DIR}/HeroState.cpp
+    ${SOURCE_DIR}/IGameObject.cpp
     ${SOURCE_DIR}/ObjectBT.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
@@ -22,6 +26,9 @@ set(SOURCES
 
 set(HEADERS
     ${HEADER_DIR}/BehaviorTree.h
+    ${HEADER_DIR}/Camera.h
+    ${HEADER_DIR}/Component.h
+    ${HEADER_DIR}/Composite.h
     ${HEADER_DIR}/Enemy.h
     ${HEADER_DIR}/EnemyBT.h
     ${HEADER_DIR}/Engine.h
@@ -29,6 +36,7 @@ set(HEADERS
     ${HEADER_DIR}/GameObject.h
     ${HEADER_DIR}/Hero.h
     ${HEADER_DIR}/HeroState.h
+    ${HEADER_DIR}/IGameObject.h
     ${HEADER_DIR}/ObjectBT.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h

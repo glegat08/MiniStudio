@@ -1,15 +1,17 @@
 #pragma once
-#include "GameObject.h"
+#include "Composite.h"
+#include "Component.h"
 
 class HeroState;
 
-class Hero : public IGameObject
+class Hero : public CompositeGameObject
 {
 public:
-	Hero();
+	Hero(const std::string& name = "Hero");
+	~Hero() = default;
 
-	int getHp() override;
-	void getStat() override;
+	void initialize(const sf::Vector2f& position, const float& size,
+					const sf::Color& color, const float& speed);
 
 private:
 	int m_health;
@@ -22,7 +24,6 @@ private:
 	float m_speed;
 	float m_velocity;
 
-
 private:
-	HeroState m_stateManager;
+	//HeroState m_stateManager;
 };
