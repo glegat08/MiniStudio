@@ -7,7 +7,6 @@ Game::Game(sf::RenderWindow* window, const float& framerate)
 	: SceneBase(window, framerate)
 {
 	initialize();
-	setPlayer();
 }
 
 void Game::setPlayer()
@@ -15,9 +14,7 @@ void Game::setPlayer()
 	TextureManager::getInstance().initialize();
 
 	m_player = std::make_shared<Hero>("Player");
-	m_player.getSprite().setPosition(500, 500);
-
-	m_player.setState(HeroStateNames::stateName::idle);
+	m_player->initialize(sf::Vector2f(400.f, 300.f), 50.f, sf::Color::Transparent, 600.f);
 
 	auto cameraTarget = std::make_shared<CameraTarget>(1.0f, true);
 	m_player->addComponent(cameraTarget);
@@ -65,7 +62,6 @@ void Game::initialize()
 void Game::processInput(const sf::Event& event)
 {
 	m_player->processInput(event);
-	m_player.handleInput();
 
 	SceneBase::processInput(event);
 }
@@ -87,7 +83,6 @@ void Game::update(const float& deltaTime)
 	}
 
 	Camera::getInstance().update(deltaTime);
-	m_player.update(deltaTime);
 }
 
 void Game::render()
@@ -98,7 +93,6 @@ void Game::render()
 	{
 		gameObject->render(*m_renderWindow);
 	}
-	m_renderWindow->draw(m_player.getSprite());
 
 	SceneBase::render();
 }
