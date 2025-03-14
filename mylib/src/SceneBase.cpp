@@ -3,11 +3,14 @@
 #include "SceneBase.h"
 #include <algorithm>
 
+SceneBase* SceneBase::m_currentScene = nullptr;
+
 SceneBase::SceneBase(sf::RenderWindow* window, const float& framerate, const std::string& name)
     : m_renderWindow(window)
     , m_refreshTime(sf::seconds(1.f / framerate))
     , m_name(name)
 {
+    m_currentScene = this;
 }
 
 void SceneBase::processInput(const sf::Event& event)
@@ -71,4 +74,9 @@ std::string SceneBase::getName() const
 void SceneBase::setName(const std::string& name)
 {
     m_name = name;
+}
+
+SceneBase* SceneBase::getCurrentScene()
+{
+    return m_currentScene;
 }
