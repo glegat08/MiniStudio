@@ -13,12 +13,12 @@ enum class Direction
 
 enum class stateName
 {
-    idle,
-    run,
-    attack,
-    shoot,
-    hurt,
-    death
+	idle,
+	move,
+	mele_attack,
+	range_attack,
+	hurt,
+	death
 };
 
 class Hero : public CompositeGameObject
