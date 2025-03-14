@@ -17,8 +17,6 @@ protected:
 	static bool isGoingDown();
 	static bool isGoingLeft();
 	static bool isGoingRight();
-	static bool isDashing();
-	static bool canDash();
 	static bool isMeleAttacking();
 	static bool isRangeAttacking();
 
@@ -44,8 +42,8 @@ private:
 	float m_frameTime = 0.5f;
 	int m_currentFrame = 1;
 	int m_frameCount = 2;
-	const int m_frameWidth = 32;
-	const int m_frameHeight = 32;
+	int m_frameWidth = 32;
+	int m_frameHeight = 32;
 };
 
 class Movement : public IState
@@ -57,12 +55,13 @@ public:
 
 private:
 	sf::Clock m_elapsedTime;
-	const float m_frameTime = 0.2f;
+	float m_frameTime = 0.2f;
 	int m_currentFrame = 3;
-	const int m_frameCount = 2;
-	const int m_frameWidth = 32;
-	const int m_frameHeight = 32;
+	int m_frameCount = 2;
+	int m_frameWidth = 32;
+	int m_frameHeight = 32;
 };
+
 
 class MeleAttack : public IState
 {
@@ -96,25 +95,6 @@ private:
 	const int m_frameWidth = 32;
 	const int m_frameHeight = 32;
 	const float m_rangeAttackDuration = 0.4f;
-};
-
-class Dash : public IState
-{
-public:
-	void handleInput(Hero& hero) override;
-	void update(Hero& hero, float deltaTime) override;
-	void setTexture(Hero& hero) override;
-
-private:
-	sf::Clock m_elapsedTime;
-	const float m_frameTime = 1.f;
-	int m_currentFrame = 2;
-	const int m_frameCount = 1;
-	const int m_frameWidth = 32;
-	const int m_frameHeight = 32;
-	const float m_dashSpeed = 250.f;
-	const float m_dashDuration = 1.f;
-	sf::Vector2f m_dashDirection;
 };
 
 class Hurt : public IState

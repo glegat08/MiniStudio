@@ -12,7 +12,6 @@ namespace HeroStateNames
 		move,
 		mele_attack,
 		range_attack,
-		dash,
 		hurt,
 		death
 	};
@@ -28,10 +27,11 @@ public:
 	using stateName = HeroStateNames::stateName;
 
 	bool isAlive();
+	bool isFacingUp() const;
+	bool isFacingLeft() const;
 	bool isMeleAttacking();
 	bool isRangeAttacking();
 	bool isInvulnerable();
-	bool isIdle() const;
 
 	void takeDamage(int damage);
 	void setInvulnerable(float duration);
@@ -44,8 +44,11 @@ public:
 	int getStrenght() const;
 	int getHp() override;
 	float getSpeed() const;
+	void setVelocity(float velocity);
+	float getVelocity() const;
 	void move(const sf::Vector2f& offset);
-	void setIdle(bool idle);
+	void setFacingUp(bool up);
+	void setFacingLeft(bool left);
 	void setState(stateName newState);
 	void pushState(stateName newState);
 	void popState();
@@ -61,8 +64,6 @@ public:
 	sf::Vector2f getPlayerPosition();
 	sf::Vector2f getPlayerCenter();
 
-
-
 protected:
 	int m_health = 10;
 	int m_armor = 10;
@@ -74,7 +75,10 @@ protected:
 	float m_velocity = 0.5f;
 
 	bool m_isIdle;
-	bool m_isMoving;
+	bool m_isFacingUp = false;
+	bool m_isFacingDown = false;
+	bool m_isFacingLeft = false;
+	bool m_isFacingRight = false;
 	bool m_isDashing;
 	bool m_isMeleAttacking;
 	bool m_isRangeAttacking;

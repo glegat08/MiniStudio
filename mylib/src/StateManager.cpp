@@ -4,12 +4,6 @@
 #include "StateManager.h"
 #include "hero.h"
 
-bool IState::m_dashAvailable = true;
-sf::Clock IState::m_dashCooldownClock;
-const float IState::m_dashCooldownDuration = 2.0f;
-bool IState::m_mouseRightPressed = false;
-bool IState::m_mouseLeftPressed = false;
-
 // ISTATE
 bool IState::isGoingUp()
 {
@@ -31,46 +25,37 @@ bool IState::isGoingRight()
     return sf::Keyboard::isKeyPressed(sf::Keyboard::D);
 }
 
-bool IState::isDashing()
-{
-    return sf::Keyboard::isKeyPressed(sf::Keyboard::LShift) && canDash();
-}
-
-bool IState::canDash()
-{
-    if (!m_dashAvailable && m_dashCooldownClock.getElapsedTime().asSeconds() >= m_dashCooldownDuration)
-        m_dashAvailable = true;
-
-    return m_dashAvailable;
-}
-
 bool IState::isMeleAttacking()
 {
-    bool currentPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::A);
-    bool result = currentPressed && !m_mouseLeftPressed;
-    m_mouseLeftPressed = currentPressed;
-    return result;
+    return sf::Mouse::isButtonPressed(sf::Mouse::Left);
 }
 
 bool IState::isRangeAttacking()
 {
-    bool currentPressed = sf::Keyboard::isKeyPressed(sf::Keyboard::E);
-    bool result = currentPressed && !m_mouseRightPressed;
-    m_mouseRightPressed = currentPressed;
-    return result;
+    return sf::Mouse::isButtonPressed(sf::Mouse::Right);
 }
 
 void IState::updateDirection(Hero& hero)
 {
-    sf::Vector2i mousePos = sf::Mouse::getPosition(); 
-    sf::Vector2f heroPos = hero.getPlayerCenter();
-
-    sf::Vector2f direction = sf::Vector2f(mousePos.x, mousePos.y) - heroPos;
-
-    float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-    if (length > 0) 
+    if (isGoingRight() && !isGoingLeft())
     {
-        direction /= length;
+        hero.setFacingLeft(false);
+        hero.getSprite().setScale(2.f, 2.f);
+    }
+    else if (isGoingLeft() && !isGoingRight())
+    {
+        hero.setFacingLeft(true);
+        hero.getSprite().setScale(-2.f, 2.f);
+    }
+    else if (isGoingUp() && !isGoingDown())
+    {
+        hero.setFacingUp(true);
+        hero.getSprite().setScale(2.f, 2.f);
+    }
+    else if (isGoingDown() && !isGoingUp())
+    {
+        hero.setFacingUp(false);
+        hero.getSprite().setScale(2.f, 2.f);
     }
 }
 
@@ -82,31 +67,38 @@ bool IState::isTemporaryState() const
 // IDLE STATE
 void Idle::handleInput(Hero& hero)
 {
-    if (isGoingUp() || isGoingDown() || isGoingLeft() || isGoingRight()) 
+    if (isGoingUp())
     {
         hero.pushState(HeroStateNames::stateName::move);
-        return;
+        m_currentFrame = 29;
     }
+    if (isGoingDown())
+    {
+        hero.pushState(HeroStateNames::stateName::move);
+        m_currentFrame = 1;
+    }
+    if (isGoingLeft())
+    {
+        hero.pushState(HeroStateNames::stateName::move);
+        m_currentFrame = 15;
+    }
+    if (isGoingRight())
+    {
+        hero.pushState(HeroStateNames::stateName::move);
+        m_currentFrame = 15;
+    }
+
+    updateDirection(hero);
 
     if (isMeleAttacking())
     {
         hero.pushState(HeroStateNames::stateName::mele_attack);
-        return;
     }
 
     if (isRangeAttacking())
     {
         hero.pushState(HeroStateNames::stateName::range_attack);
-        return;
     }
-
-	if (isDashing()) 
-    {
-        hero.pushState(HeroStateNames::stateName::dash);
-        return;
-    }
-
-    updateDirection(hero);
 }
 
 void Idle::update(Hero& hero, float deltaTime)
@@ -129,25 +121,17 @@ void Idle::setTexture(Hero& hero)
 // MOVING STATE
 void Movement::handleInput(Hero& hero)
 {
-    if ((!isGoingRight() && !isGoingLeft()) || (isGoingRight() && isGoingLeft()) || (isGoingUp() && isGoingDown() || (!isGoingUp() && !isGoingDown())))
+    if (!isGoingRight() && !isGoingLeft() && !isGoingUp() && !isGoingDown())
         hero.setState(HeroStateNames::stateName::idle);
 
     if (isMeleAttacking())
     {
         hero.pushState(HeroStateNames::stateName::mele_attack);
-        return;
     }
 
     if (isRangeAttacking())
     {
         hero.pushState(HeroStateNames::stateName::range_attack);
-        return;
-    }
-
-    if (isDashing()) 
-    {
-        hero.pushState(HeroStateNames::stateName::dash);
-        return;
     }
 
     updateDirection(hero);
@@ -162,11 +146,25 @@ void Movement::update(Hero& hero, float deltaTime)
         if (isGoingRight() && !isGoingLeft())
         {
             hero.move(sf::Vector2f(hero.getSpeed() * clampedDeltaTime, 0));
+            m_currentFrame = 17;
             updateDirection(hero);
         }
         else if (isGoingLeft() && !isGoingRight())
         {
             hero.move(sf::Vector2f(-hero.getSpeed() * clampedDeltaTime, 0));
+            m_currentFrame = 17;
+            updateDirection(hero);
+        }
+        else if (isGoingUp() && !isGoingDown())
+        {
+            hero.move(sf::Vector2f(0, hero.getSpeed() * clampedDeltaTime));
+            m_currentFrame = 31;
+            updateDirection(hero);
+        }
+        else if (isGoingDown() && !isGoingUp())
+        {
+            hero.move(sf::Vector2f(0, -hero.getSpeed() * clampedDeltaTime));
+            m_currentFrame = 3;
             updateDirection(hero);
         }
 
@@ -183,47 +181,6 @@ void Movement::update(Hero& hero, float deltaTime)
 void Movement::setTexture(Hero& hero)
 {
     hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::move));
-}
-
-// DASH STATE
-void Dash::handleInput(Hero& hero)
-{
-    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_dashDuration)
-    {
-        if (!hero.getStateManager().isStateStackEmpty())
-            hero.getStateManager().popState(&hero);
-        else
-        {
-            if (isGoingLeft() || isGoingRight())
-                hero.setState(HeroStateNames::stateName::move);
-            else
-                hero.setState(HeroStateNames::stateName::idle);
-        }
-    }
-}
-
-void Dash::update(Hero& hero, float deltaTime)
-{
-    float clampedDeltaTime = std::min(deltaTime, 0.1f);
-    float dashDirection = hero.isIdle() ? -1.0f : 1.0f;
-
-    IState::m_dashCooldownClock.restart();
-    IState::m_dashAvailable = false;
-
-    hero.move(sf::Vector2f(m_dashSpeed * dashDirection * clampedDeltaTime, 0));
-
-    if (m_elapsedTime.getElapsedTime().asSeconds() >= m_frameTime)
-    {
-        m_currentFrame = (m_currentFrame + 1) % m_frameCount;
-        m_elapsedTime.restart();
-        sf::IntRect currentFrameRect(m_currentFrame * m_frameWidth, 0, m_frameWidth, m_frameHeight);
-        hero.getSprite().setTextureRect(currentFrameRect);
-    }
-}
-
-void Dash::setTexture(Hero& hero)
-{
-    hero.getSprite().setTexture(hero.getTexture(HeroStateNames::stateName::dash));
 }
 
 // ATTACK STATE

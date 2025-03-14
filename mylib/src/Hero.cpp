@@ -16,27 +16,32 @@ bool Hero::isAlive()
 
 bool Hero::isMeleAttacking()
 {
-    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::mele_attack;
+    return m_isMeleAttacking;
 }
 
 bool Hero::isRangeAttacking()
 {
-	return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::range_attack;
+	return m_isRangeAttacking;
 }
 
 bool Hero::isInvulnerable()
 {
-    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::hurt;
+    return m_isInvulnerable;
 }
 
-bool Hero::isIdle() const
+bool Hero::isFacingUp() const
 {
-    return m_stateManager.getCurrentStateName() == HeroStateNames::stateName::idle;
+    return m_isFacingUp;
+}
+
+bool Hero::isFacingLeft() const
+{
+    return m_isFacingLeft;
 }
 
 void Hero::takeDamage(int damage)
 {
-    if (isInvulnerable())
+    if (m_isInvulnerable)
         return;
 
     int actualDamage = std::max(1, damage - m_armor / 2);
@@ -44,11 +49,13 @@ void Hero::takeDamage(int damage)
 
     if (m_health <= 0)
     {
-        m_stateManager.setState(this, HeroStateNames::stateName::death);
+        m_health = 0;
+        m_isDead = true;
+        setState(stateName::death);
     }
     else
     {
-        m_stateManager.setState(this, HeroStateNames::stateName::hurt);
+        setState(stateName::hurt);
         setInvulnerable(1.0f);
     }
 }
@@ -68,12 +75,12 @@ void Hero::updateInvulnerabilityEffect()
 
 void Hero::meleAttacking()
 {
-    m_stateManager.setState(this, HeroStateNames::stateName::mele_attack);
+    m_stateManager.setState(this, stateName::mele_attack);
 }
 
 void Hero::rangeAttacking()
 {
-    m_stateManager.setState(this, HeroStateNames::stateName::range_attack);
+    m_stateManager.setState(this, stateName::range_attack);
 }
 
 void Hero::handleInput()
@@ -107,18 +114,33 @@ float Hero::getSpeed() const
     return m_speed;
 }
 
+void Hero::setVelocity(float velocity)
+{
+    m_velocity = velocity;
+
+}
+
+float Hero::getVelocity() const
+{
+    return m_velocity;
+}
+
+
 void Hero::move(const sf::Vector2f& offset)
 {
     m_sprites.move(offset);
 }
 
-void Hero::setIdle(bool idle)
+void Hero::setFacingUp(bool up)
 {
-    if (idle && m_stateManager.getCurrentStateName() != HeroStateNames::stateName::idle)
-    {
-        m_stateManager.setState(this, HeroStateNames::stateName::idle);
-    }
+    m_isFacingUp = up;
 }
+
+void Hero::setFacingLeft(bool left)
+{
+    m_isFacingLeft = left;
+}
+
 
 void Hero::setState(stateName newState)
 {
@@ -164,7 +186,6 @@ void Hero::setStateTexture()
 {
     m_textures[stateName::idle].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
     m_textures[stateName::move].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
-    m_textures[stateName::dash].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
     m_textures[stateName::mele_attack].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
     m_textures[stateName::range_attack].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
     m_textures[stateName::hurt].loadFromFile(PathManager::getResourcePath("hero\\spritesheet_orc.png"));
@@ -191,7 +212,7 @@ sf::FloatRect Hero::getHitbox() const
     {
     case stateName::move:
         width = spriteRect.width * 0.3f;
-        if (m_isMoving)
+        if (m_isFacingUp || m_isFacingDown || m_isFacingLeft || m_isFacingRight)
             offsetX = spriteRect.width * 0.65f;
         else
             offsetX = spriteRect.width * 0.05f;
@@ -210,14 +231,6 @@ sf::FloatRect Hero::getHitbox() const
         else
             offsetX = spriteRect.width * 0.05f;
         break;
-    case stateName::dash:
-        width = spriteRect.width * 0.5f;
-        if (m_isDashing)
-            offsetX = spriteRect.width * 0.45f;
-        else
-            offsetX = spriteRect.width * 0.05f;
-        break;
-    
     }
 
     float x = spriteRect.left + offsetX;
