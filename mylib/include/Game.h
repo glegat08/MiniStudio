@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Hero.h"
 #include "SceneBase.h"
 #include "Hero.h"
 

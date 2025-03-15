@@ -2,9 +2,13 @@
 #include <memory>
 #include <map>
 #include <string>
+#include "StateManager.h"
 
 class Hero;
 class IState;
+
+enum class Direction;
+enum class stateName;
 
 class HeroState
 {
