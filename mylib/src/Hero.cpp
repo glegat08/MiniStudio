@@ -24,10 +24,6 @@ void Hero::initialize(const sf::Vector2f& position, const float& size, const sf:
     this->addComponent(renderer);
     renderer->setPosition(position);
 
-    sf::Color collisionColor = color;
-    collisionColor.a = 50;
-    renderer->setColor(collisionColor);
-
     auto controller = std::make_shared<PlayerController>(speed);
     addComponent(controller);
 
@@ -53,105 +49,16 @@ void Hero::loadTextures()
 void Hero::initializeAnimations()
 {
     auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp) 
+    if (!animComp)
         return;
 
-    const sf::Vector2i frameSize(32, 32);
+    downAnimation();
+    upAnimation();
+    rightAnimation();
+    hurtAnimation();
+    deathAnimation();
 
-    const int idleFrameCount = 2;
-    const int runFrameCount = 2;
-    const int shootFrameCount = 4;
-    const int attackFrameCount = 6;
-    const int hurtFrameCount = 1;
-    const int deathFrameCount = 18;
-
-    const int downRow = 0;
-    const int rightRow = 1;
-    const int upRow = 2;
-    const int deathRow = 3;
-    const int hurtRow = 4;
-
-    const int idleOffset = 0;
-    const int runOffset = idleFrameCount;
-    const int shootOffset = idleFrameCount + runFrameCount;
-    const int attackOffset = idleFrameCount + runFrameCount + shootFrameCount;
-
-    // DOWN direction animations
-    Animation idleDownAnim("player", idleFrameCount, 0.4f);
-    idleDownAnim.setFrameSize(frameSize);
-    idleDownAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("idle_down", idleDownAnim);
-
-    Animation runDownAnim("player", runFrameCount, 0.2f);
-    runDownAnim.setFrameSize(frameSize);
-    runDownAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("run_down", runDownAnim);
-
-    Animation shootDownAnim("player", shootFrameCount, 0.1f, false);
-    shootDownAnim.setFrameSize(frameSize);
-    shootDownAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("shoot_down", shootDownAnim);
-
-    Animation attackDownAnim("player", attackFrameCount, 0.1f, false);
-    attackDownAnim.setFrameSize(frameSize);
-    attackDownAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("attack_down", attackDownAnim);
-
-    // RIGHT direction animations
-    Animation idleRightAnim("player", idleFrameCount, 0.4f);
-    idleRightAnim.setFrameSize(frameSize);
-    idleRightAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("idle_right", idleRightAnim);
-
-    Animation runRightAnim("player", runFrameCount, 0.2f);
-    runRightAnim.setFrameSize(frameSize);
-    runRightAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("run_right", runRightAnim);
-
-    Animation shootRightAnim("player", shootFrameCount, 0.1f, false);
-    shootRightAnim.setFrameSize(frameSize);
-    shootRightAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("shoot_right", shootRightAnim);
-
-    Animation attackRightAnim("player", attackFrameCount, 0.1f, false);
-    attackRightAnim.setFrameSize(frameSize);
-    attackRightAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("attack_right", attackRightAnim);
-
-    // UP direction animations
-    Animation idleUpAnim("player", idleFrameCount, 0.4f);
-    idleUpAnim.setFrameSize(frameSize);
-    idleUpAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("idle_up", idleUpAnim);
-
-    Animation runUpAnim("player", runFrameCount, 0.2f);
-    runUpAnim.setFrameSize(frameSize);
-    runUpAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("run_up", runUpAnim);
-
-    Animation shootUpAnim("player", shootFrameCount, 0.1f, false);
-    shootUpAnim.setFrameSize(frameSize);
-    shootUpAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("shoot_up", shootUpAnim);
-
-    Animation attackUpAnim("player", attackFrameCount, 0.1f, false);
-    attackUpAnim.setFrameSize(frameSize);
-    attackUpAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("attack_up", attackUpAnim);
-
-    // HURT animation (single row)
-    Animation hurtAnim("player", hurtFrameCount, 0.15f, false);
-    hurtAnim.setFrameSize(frameSize);
-    hurtAnim.setStartPosition(sf::Vector2i(0, hurtRow * frameSize.y));
-    animComp->addAnimation("hurt", hurtAnim);
-
-    // DEATH animation (single row)
-    Animation deathAnim("player", deathFrameCount, 0.2f, false);
-    deathAnim.setFrameSize(frameSize);
-    deathAnim.setStartPosition(sf::Vector2i(0, deathRow * frameSize.y));
-    animComp->addAnimation("death", deathAnim);
-
-    // Set default animation
+    // default animation
     animComp->playAnimation("idle_down");
 }
 
@@ -188,7 +95,8 @@ bool Hero::isAlive() const
 void Hero::takeDamage(int amount)
 {
     int actualDamage = amount - m_armor;
-    if (actualDamage < 1) actualDamage = 1;
+    if (actualDamage < 1) 
+        actualDamage = 1;
 
     m_health -= actualDamage;
 
@@ -259,21 +167,19 @@ void Hero::setState(stateName newState)
     if (!animComp) 
         return;
 
-    std::string dirSuffix;
+    std::string directionSuffix;
     switch (m_currentDirection)
 	{
     case Direction::Up:
-        dirSuffix = "_up";
+        directionSuffix = "_up";
         break;
     case Direction::Right:
-        dirSuffix = "_right";
-        break;
     case Direction::Left:
-        dirSuffix = "_left";
+        directionSuffix = "_right";
         break;
     case Direction::Down:
     default:
-        dirSuffix = "_down";
+        directionSuffix = "_down";
         break;
     }
 
@@ -292,16 +198,16 @@ void Hero::setState(stateName newState)
     switch (newState)
 	{
     case stateName::idle:
-        animComp->playAnimation("idle" + dirSuffix);
+        animComp->playAnimation("idle" + directionSuffix);
         break;
     case stateName::run:
-        animComp->playAnimation("run" + dirSuffix);
+        animComp->playAnimation("run" + directionSuffix);
         break;
     case stateName::attack:
-        animComp->playAnimation("attack" + dirSuffix);
+        animComp->playAnimation("attack" + directionSuffix);
         break;
     case stateName::shoot:
-        animComp->playAnimation("shoot" + dirSuffix);
+        animComp->playAnimation("shoot" + directionSuffix);
         break;
     default:
         break;
@@ -326,4 +232,119 @@ bool Hero::isFacingLeft() const
 HeroState& Hero::getStateManager()
 {
     return m_stateManager;
+}
+
+void Hero::downAnimation()
+{
+    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animComp)
+        return;
+
+    const sf::Vector2i frameSize(32, 32);
+
+    Animation idleDownAnim("player", idleFrameCount, 0.4f);
+    idleDownAnim.setFrameSize(frameSize);
+    idleDownAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, downRow * frameSize.y));
+    animComp->addAnimation("idle_down", idleDownAnim);
+
+    Animation runDownAnim("player", runFrameCount, 0.2f);
+    runDownAnim.setFrameSize(frameSize);
+    runDownAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, downRow * frameSize.y));
+    animComp->addAnimation("run_down", runDownAnim);
+
+    Animation shootDownAnim("player", shootFrameCount, 0.1f, false);
+    shootDownAnim.setFrameSize(frameSize);
+    shootDownAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, downRow * frameSize.y));
+    animComp->addAnimation("shoot_down", shootDownAnim);
+
+    Animation attackDownAnim("player", attackFrameCount, 0.1f, false);
+    attackDownAnim.setFrameSize(frameSize);
+    attackDownAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, downRow * frameSize.y));
+    animComp->addAnimation("attack_down", attackDownAnim);
+}
+
+void Hero::upAnimation()
+{
+    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animComp)
+        return;
+
+    const sf::Vector2i frameSize(32, 32);
+
+    Animation idleUpAnim("player", idleFrameCount, 0.4f);
+    idleUpAnim.setFrameSize(frameSize);
+    idleUpAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, upRow * frameSize.y));
+    animComp->addAnimation("idle_up", idleUpAnim);
+
+    Animation runUpAnim("player", runFrameCount, 0.2f);
+    runUpAnim.setFrameSize(frameSize);
+    runUpAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, upRow * frameSize.y));
+    animComp->addAnimation("run_up", runUpAnim);
+
+    Animation shootUpAnim("player", shootFrameCount, 0.1f, false);
+    shootUpAnim.setFrameSize(frameSize);
+    shootUpAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, upRow * frameSize.y));
+    animComp->addAnimation("shoot_up", shootUpAnim);
+
+    Animation attackUpAnim("player", attackFrameCount, 0.1f, false);
+    attackUpAnim.setFrameSize(frameSize);
+    attackUpAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, upRow * frameSize.y));
+    animComp->addAnimation("attack_up", attackUpAnim);
+}
+
+void Hero::rightAnimation()
+{
+    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animComp)
+        return;
+
+    const sf::Vector2i frameSize(32, 32);
+
+    Animation idleRightAnim("player", idleFrameCount, 0.4f);
+    idleRightAnim.setFrameSize(frameSize);
+    idleRightAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, rightRow * frameSize.y));
+    animComp->addAnimation("idle_right", idleRightAnim);
+
+    Animation runRightAnim("player", runFrameCount, 0.2f);
+    runRightAnim.setFrameSize(frameSize);
+    runRightAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, rightRow * frameSize.y));
+    animComp->addAnimation("run_right", runRightAnim);
+
+    Animation shootRightAnim("player", shootFrameCount, 0.1f, false);
+    shootRightAnim.setFrameSize(frameSize);
+    shootRightAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, rightRow * frameSize.y));
+    animComp->addAnimation("shoot_right", shootRightAnim);
+
+    Animation attackRightAnim("player", attackFrameCount, 0.1f, false);
+    attackRightAnim.setFrameSize(frameSize);
+    attackRightAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, rightRow * frameSize.y));
+    animComp->addAnimation("attack_right", attackRightAnim);
+}
+
+void Hero::hurtAnimation()
+{
+    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animComp)
+        return;
+
+    const sf::Vector2i frameSize(32, 32);
+
+    Animation hurtAnim("player", hurtFrameCount, 0.15f, false);
+    hurtAnim.setFrameSize(frameSize);
+    hurtAnim.setStartPosition(sf::Vector2i(0, hurtRow * frameSize.y));
+    animComp->addAnimation("hurt", hurtAnim);
+}
+
+void Hero::deathAnimation()
+{
+    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animComp)
+        return;
+
+    const sf::Vector2i frameSize(32, 32);
+
+    Animation deathAnim("player", deathFrameCount, 0.2f, false);
+    deathAnim.setFrameSize(frameSize);
+    deathAnim.setStartPosition(sf::Vector2i(0, deathRow * frameSize.y));
+    animComp->addAnimation("death", deathAnim);
 }

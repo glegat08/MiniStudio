@@ -10,21 +10,19 @@ CameraTargetAdapter::CameraTargetAdapter(CompositeGameObject* owner)
 sf::Vector2f CameraTargetAdapter::getPosition() const
 {
     if (!m_owner)
-        return sf::Vector2f(0.f, 0.f);
+        return { 0.f, 0.f };
 
     auto* renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
     if (renderer)
-    {
         return renderer->getPosition();
-    }
 
-    return sf::Vector2f(0.f, 0.f);
+    return { 0.f, 0.f };
 }
 
 sf::Vector2f CameraTargetAdapter::getVelocity() const
 {
     if (!m_owner)
-        return sf::Vector2f(0.f, 0.f);
+        return { 0.f, 0.f };
 
     auto* controller = static_cast<PlayerController*>(m_owner->getComponent("PlayerController"));
     if (controller)
@@ -51,7 +49,7 @@ sf::Vector2f CameraTargetAdapter::getVelocity() const
         return velocity;
     }
 
-    return sf::Vector2f(0.f, 0.f);
+    return { 0.f, 0.f };
 }
 
 Camera::Camera()
@@ -195,13 +193,13 @@ sf::FloatRect Camera::getVisibleArea() const
     sf::Vector2f center = m_view.getCenter();
     sf::Vector2f size = m_view.getSize();
 
-    return sf::FloatRect
-    (
+    return
+	{
         center.x - size.x / 2.f,
         center.y - size.y / 2.f,
         size.x,
         size.y
-    );
+    };
 }
 
 void Camera::applyWorldBounds()
@@ -269,7 +267,7 @@ void CameraTarget::initialize()
 
     if (m_owner)
     {
-        m_adapter = new CameraTargetAdapter(static_cast<CompositeGameObject*>(m_owner));
+        m_adapter = new CameraTargetAdapter(m_owner);
 
         if (m_autoFollow)
             activate();
