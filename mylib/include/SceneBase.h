@@ -1,10 +1,12 @@
 #pragma once
 
+#include <unordered_map>
 #include <SFML/Graphics.hpp>
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
 
-#include "Composite.h"
+class CompositeGameObject;
+class TileMap;
 
 class SceneBase
 {
