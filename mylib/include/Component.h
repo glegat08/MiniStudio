@@ -61,6 +61,12 @@ public:
 	void setSpeed(float speed);
 	float getSpeed() const;
 
+	bool isMoving() const;
+	bool isMovingUp() const;
+	bool isMovingDown() const;
+	bool isMovingLeft() const;
+	bool isMovingRight() const;
+
 	friend class CameraTargetAdapter;
 
 private:

@@ -21,10 +21,14 @@ public:
     sf::Time getRefreshTime() const;
     std::string getName() const;
     void setName(const std::string& name);
+    static SceneBase* getCurrentScene();
 
 protected:
     sf::RenderWindow* m_renderWindow;
     sf::Time m_refreshTime;
     std::string m_name;
     std::vector<std::unique_ptr<SceneBase>> m_children;
+
+private:
+    static SceneBase* m_currentScene;
 };

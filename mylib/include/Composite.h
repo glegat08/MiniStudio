@@ -17,6 +17,7 @@ public:
 
 	void addComponent(std::shared_ptr<Component> component);
 	Component* getComponent(const std::string& name);
+	const Component* getComponent(const std::string& name) const;
 	void removeComponent(const std::string& name);
 
 private:

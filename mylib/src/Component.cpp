@@ -104,50 +104,19 @@ void PlayerController::initialize()
 
 void PlayerController::processInput(const sf::Event& event)
 {
-    if (event.type == sf::Event::KeyPressed)
-    {
-        switch (event.key.code)
-        {
-        case sf::Keyboard::Z:
-        case sf::Keyboard::Up:
-            m_isMovingUp = true;
-            break;
-        case sf::Keyboard::S:
-        case sf::Keyboard::Down:
-            m_isMovingDown = true;
-            break;
-        case sf::Keyboard::Q:
-        case sf::Keyboard::Left:
-            m_isMovingLeft = true;
-            break;
-        case sf::Keyboard::D:
-        case sf::Keyboard::Right:
-            m_isMovingRight = true;
-            break;
-        }
-    }
-    else if (event.type == sf::Event::KeyReleased)
-    {
-        switch (event.key.code)
-        {
-        case sf::Keyboard::Z:
-        case sf::Keyboard::Up:
-            m_isMovingUp = false;
-            break;
-        case sf::Keyboard::S:
-        case sf::Keyboard::Down:
-            m_isMovingDown = false;
-            break;
-        case sf::Keyboard::Q:
-        case sf::Keyboard::Left:
-            m_isMovingLeft = false;
-            break;
-        case sf::Keyboard::D:
-        case sf::Keyboard::Right:
-            m_isMovingRight = false;
-            break;
-        }
-    }
+    m_isMovingUp = false;
+    m_isMovingDown = false;
+    m_isMovingLeft = false;
+    m_isMovingRight = false;
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Z))
+        m_isMovingUp = true;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::S))
+        m_isMovingDown = true;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q))
+        m_isMovingLeft = true;
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::D))
+        m_isMovingRight = true;
 }
 
 void PlayerController::update(const float& deltaTime)
@@ -195,4 +164,29 @@ void PlayerController::setSpeed(float speed)
 float PlayerController::getSpeed() const
 {
     return m_speed;
+}
+
+bool PlayerController::isMoving() const
+{
+    return m_isMovingUp || m_isMovingDown || m_isMovingLeft || m_isMovingRight;
+}
+
+bool PlayerController::isMovingUp() const
+{
+    return m_isMovingUp;
+}
+
+bool PlayerController::isMovingDown() const
+{
+    return m_isMovingDown;
+}
+
+bool PlayerController::isMovingLeft() const
+{
+    return m_isMovingLeft;
+}
+
+bool PlayerController::isMovingRight() const
+{
+    return m_isMovingRight;
 }

@@ -1,18 +1,23 @@
 #include "Game.h"
 #include "Camera.h"
+#include "Enemy.h"
+#include "TextureManager.h"
 
 Game::Game(sf::RenderWindow* window, const float& framerate)
 	: SceneBase(window, framerate)
 {
 	initialize();
+	setPlayer();
 }
 
 void Game::setPlayer()
 {
+	TextureManager::getInstance().initialize();
+
 	m_player = std::make_shared<Hero>("Player");
-	m_player->setCategory("Player");
-	m_player->addTag("Hero");
-	m_player->initialize(sf::Vector2f(400.f, 300.f), 50.f, sf::Color::Blue, 1000.f);
+	m_player.getSprite().setPosition(500, 500);
+
+	m_player.setState(HeroStateNames::stateName::idle);
 
 	auto cameraTarget = std::make_shared<CameraTarget>(1.0f, true);
 	m_player->addComponent(cameraTarget);
@@ -22,38 +27,35 @@ void Game::setPlayer()
 
 void Game::setEnemy()
 {
-	auto enemy = std::make_shared<CompositeGameObject>("Enemy");
-	enemy->setCategory("Enemy");
-	enemy->addTag("BasicEnemy");
-
-	auto renderer = std::make_shared<SquareRenderer>(100.0f, sf::Color::Red);
-	enemy->addComponent(renderer);
-
 	sf::Vector2u windowSize = m_renderWindow->getSize();
-	sf::Vector2f position(windowSize.x * 0.75f, windowSize.y * 0.75f);
-	renderer->setPosition(position);
 
-	m_gameObjects.push_back(enemy);
+	auto meleeEnemy = std::make_shared<MeleeEnemy>("MeleeEnemy1");
+	sf::Vector2f meleePos(windowSize.x * 0.75f, windowSize.y * 0.25f);
+	meleeEnemy->init(meleePos);
+	m_gameObjects.push_back(meleeEnemy);
 
-	auto enemy2 = std::make_shared<CompositeGameObject>("Enemy2");
-	enemy2->setCategory("Enemy");
-	enemy2->addTag("MageEnemy");
+	auto meleeEnemy2 = std::make_shared<MeleeEnemy>("MeleeEnemy2");
+	sf::Vector2f meleePos2(windowSize.x * 0.25f, windowSize.y * 0.75f);
+	meleeEnemy2->init(meleePos2);
+	m_gameObjects.push_back(meleeEnemy2);
 
-	auto render2 = std::make_shared<SquareRenderer>(85.f, sf::Color::Green);
-	enemy2->addComponent(render2);
+	auto rangedEnemy = std::make_shared<RangedEnemy>("RangedEnemy1");
+	sf::Vector2f rangedPos(windowSize.x * 0.75f, windowSize.y * 0.75f);
+	rangedEnemy->init(rangedPos);
+	m_gameObjects.push_back(rangedEnemy);
 
-	sf::Vector2f position2(windowSize.x * 0.85f, windowSize.y * 0.85f);
-	render2->setPosition(position2);
-
-	m_gameObjects.push_back(enemy2);
+	auto rangedEnemy2 = std::make_shared<RangedEnemy>("RangedEnemy2");
+	sf::Vector2f rangedPos2(windowSize.x * 0.25f, windowSize.y * 0.25f);
+	rangedEnemy2->init(rangedPos2);
+	m_gameObjects.push_back(rangedEnemy2);
 }
 
 void Game::initialize()
 {
 	Camera::getInstance().initialize(m_renderWindow);
 
-	Camera::getInstance().setZoom(1.5f);
-	Camera::getInstance().setWorldBounds(sf::FloatRect(0, 0, 3000, 3000));
+	Camera::getInstance().setZoom(1.f);
+	//Camera::getInstance().setWorldBounds(sf::FloatRect(0, 0, 3000, 3000));
 	Camera::getInstance().setInterpolationSpeed(4.0f);
 
 	setPlayer();
@@ -62,8 +64,8 @@ void Game::initialize()
 
 void Game::processInput(const sf::Event& event)
 {
-	if (m_player)
-		m_player->processInput(event);
+	m_player->processInput(event);
+	m_player.handleInput();
 
 	SceneBase::processInput(event);
 }
@@ -77,7 +79,15 @@ void Game::update(const float& deltaTime)
 		gameObject->update(deltaTime);
 	}
 
+	auto playerRender = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
+	if (playerRender)
+	{
+		sf::Vector2f playerPos = playerRender->getPosition();
+		IEnemy::updateAllEnemyLOS(m_gameObjects, playerPos);
+	}
+
 	Camera::getInstance().update(deltaTime);
+	m_player.update(deltaTime);
 }
 
 void Game::render()
@@ -88,6 +98,7 @@ void Game::render()
 	{
 		gameObject->render(*m_renderWindow);
 	}
+	m_renderWindow->draw(m_player.getSprite());
 
 	SceneBase::render();
 }

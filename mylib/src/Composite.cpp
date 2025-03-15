@@ -45,6 +45,15 @@ Component* CompositeGameObject::getComponent(const std::string& name)
 	return nullptr;
 }
 
+const Component* CompositeGameObject::getComponent(const std::string& name) const
+{
+	auto it = m_components.find(name);
+	if (it != m_components.end())
+		return it->second.get();
+
+	return nullptr;
+}
+
 void CompositeGameObject::removeComponent(const std::string& name)
 {
 	auto it = m_components.find(name);
