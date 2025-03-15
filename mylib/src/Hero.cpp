@@ -266,10 +266,8 @@ void Hero::setState(stateName newState)
         dirSuffix = "_up";
         break;
     case Direction::Right:
-        dirSuffix = "_right";
-        break;
     case Direction::Left:
-        dirSuffix = "_left";
+        dirSuffix = "_right";
         break;
     case Direction::Down:
     default:
