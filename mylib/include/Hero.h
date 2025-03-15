@@ -57,6 +57,13 @@ public:
     HeroState& getStateManager();
 
 private:
+    void downAnimation();
+    void upAnimation();
+    void rightAnimation();
+    void hurtAnimation();
+    void deathAnimation();
+
+private:
     int m_health;
     int m_armor;
     int m_strength;
@@ -69,4 +76,23 @@ private:
     float m_speed;
 
     HeroState m_stateManager;
+
+private:
+    const int idleFrameCount = 2;
+    const int runFrameCount = 2;
+    const int shootFrameCount = 4;
+    const int attackFrameCount = 6;
+    const int hurtFrameCount = 1;
+    const int deathFrameCount = 18;
+
+    const int downRow = 0;
+    const int rightRow = 1;
+    const int upRow = 2;
+    const int deathRow = 3;
+    const int hurtRow = 4;
+
+    const int idleOffset = 0;
+    const int runOffset = idleFrameCount;
+    const int shootOffset = idleFrameCount + runFrameCount;
+    const int attackOffset = idleFrameCount + runFrameCount + shootFrameCount;
 };
