@@ -1,5 +1,7 @@
 #include "Component.h"
 #include "Composite.h"
+#include "PathManager.h"
+#include "TextureManager.h"
 
 Component::Component(const std::string& name)
 	: m_name(name)
@@ -189,4 +191,219 @@ bool PlayerController::isMovingLeft() const
 bool PlayerController::isMovingRight() const
 {
     return m_isMovingRight;
+}
+
+TileComponent::TileComponent(const std::string& tilesetName)
+    : Component("TileComponent")
+    , m_tilesetName(tilesetName)
+    , m_tileId(0)
+    , m_gridPosition(0, 0)
+    , m_size(32.0f)
+    , m_walkable(true)
+{
+}
+
+void TileComponent::initialize()
+{
+    Component::initialize();
+    updateTextureRect();
+}
+
+void TileComponent::update(const float& deltaTime)
+{}
+
+void TileComponent::render(sf::RenderWindow& window)
+{
+    if (m_tileId > 0)
+        window.draw(m_sprite);
+}
+
+void TileComponent::setTileId(int id)
+{
+    m_tileId = id;
+    updateTextureRect();
+}
+
+int TileComponent::getTileId() const
+{
+    return m_tileId;
+}
+
+void TileComponent::setPosition(int gridX, int gridY)
+{
+    m_gridPosition.x = gridX;
+    m_gridPosition.y = gridY;
+    m_sprite.setPosition(gridX * m_size, gridY * m_size);
+}
+
+sf::Vector2i TileComponent::getGridPosition() const
+{
+    return m_gridPosition;
+}
+
+sf::Vector2f TileComponent::getWorldPosition() const
+{
+    return sf::Vector2f(m_gridPosition.x * m_size, m_gridPosition.y * m_size);
+}
+
+void TileComponent::setSize(float size)
+{
+    m_size = size;
+    m_sprite.setScale(m_size / 32.0f, m_size / 32.0f);  // Assuming default tile size in tileset is 32x32
+    m_sprite.setPosition(m_gridPosition.x * m_size, m_gridPosition.y * m_size);
+}
+
+float TileComponent::getSize() const
+{
+    return m_size;
+}
+
+bool TileComponent::isWalkable() const
+{
+    return m_walkable;
+}
+
+void TileComponent::setWalkable(bool walkable)
+{
+    m_walkable = walkable;
+}
+
+void TileComponent::setTilesetName(const std::string& tilesetName)
+{
+    m_tilesetName = tilesetName;
+    updateTextureRect();
+}
+
+std::string TileComponent::getTilesetName() const
+{
+    return m_tilesetName;
+}
+
+void TileComponent::updateTextureRect()
+{
+    if (m_tileId <= 0 || m_tilesetName.empty())
+        return;
+
+    sf::Texture* texture = TextureManager::getInstance().getTexture(m_tilesetName);
+    if (!texture)
+        return;
+
+    m_sprite.setTexture(*texture);
+
+    const int tileSize = 32;
+    const int tilesPerRow = texture->getSize().x / tileSize;
+
+    int tileX = (m_tileId - 1) % tilesPerRow;
+    int tileY = (m_tileId - 1) / tilesPerRow;
+
+    m_textureRect = sf::IntRect(tileX * tileSize, tileY * tileSize, tileSize, tileSize);
+    m_sprite.setTextureRect(m_textureRect);
+
+    m_sprite.setOrigin(0.0f, 0.0f);
+    m_sprite.setPosition(m_gridPosition.x * m_size, m_gridPosition.y * m_size);
+    m_sprite.setScale(m_size / tileSize, m_size / tileSize);
+}
+
+TileMap::TileMap(int width, int height, float tileSize)
+    : Component("TileMap")
+    , m_width(width)
+    , m_height(height)
+    , m_tileSize(tileSize)
+{
+    resize(width, height);
+}
+
+void TileMap::initialize()
+{
+    Component::initialize();
+}
+
+void TileMap::update(const float& deltaTime)
+{}
+
+void TileMap::render(sf::RenderWindow& window)
+{
+    for (int y = 0; y < m_height; ++y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            if (m_tiles[y][x])
+                m_tiles[y][x]->render(window);
+        }
+    }
+}
+
+void TileMap::setTile(int x, int y, int tileId, const std::string& tilesetName)
+{
+    if (!isValidPosition(x, y))
+        return;
+
+    if (!m_tiles[y][x])
+    {
+        m_tiles[y][x] = std::make_shared<TileComponent>(tilesetName);
+        m_tiles[y][x]->setSize(m_tileSize);
+        m_tiles[y][x]->setPosition(x, y);
+    }
+
+    m_tiles[y][x]->setTileId(tileId);
+    m_tiles[y][x]->setTilesetName(tilesetName);
+}
+
+TileComponent* TileMap::getTile(int x, int y)
+{
+    if (!isValidPosition(x, y))
+        return nullptr;
+
+    return m_tiles[y][x].get();
+}
+
+void TileMap::clear()
+{
+    for (int y = 0; y < m_height; ++y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            m_tiles[y][x].reset();
+        }
+    }
+}
+
+void TileMap::resize(int width, int height)
+{
+    m_width = width;
+    m_height = height;
+
+    m_tiles.resize(height);
+    for (int y = 0; y < height; ++y)
+    {
+        m_tiles[y].resize(width);
+        for (int x = 0; x < width; ++x)
+        {
+            m_tiles[y][x] = nullptr;
+        }
+    }
+}
+
+sf::Vector2i TileMap::getSize() const
+{
+    return sf::Vector2i(m_width, m_height);
+}
+
+float TileMap::getTileSize() const
+{
+    return m_tileSize;
+}
+
+void TileMap::setTileSize(float size)
+{
+    m_tileSize = size;
+
+    for (int y = 0; y < m_height; ++y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            if (m_tiles[y][x])
+                m_tiles[y][x]->setSize(size);
+        }
+    }
 }
