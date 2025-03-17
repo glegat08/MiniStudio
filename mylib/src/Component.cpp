@@ -1,4 +1,7 @@
 #include "Component.h"
+
+#include <iostream>
+
 #include "Composite.h"
 #include "PathManager.h"
 #include "TextureManager.h"
@@ -406,4 +409,91 @@ void TileMap::setTileSize(float size)
                 m_tiles[y][x]->setSize(size);
         }
     }
+}
+
+bool TileMap::isValidPosition(int x, int y) const
+{
+    return (x >= 0 && x < m_width && y >= 0 && y < m_height);
+}
+
+bool TileMap::loadFromFile(const std::string& filename)
+{
+    FILE* file = fopen(filename.c_str(), "r");
+    if (!file)
+    {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return false;
+    }
+
+    if (fscanf(file, "%d %d %f", &m_width, &m_height, &m_tileSize) != 3)
+    {
+        std::cerr << "Error reading map dimensions from file" << std::endl;
+        fclose(file);
+        return false;
+    }
+
+    resize(m_width, m_height);
+
+    for (int y = 0; y < m_height; ++y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            int tileId;
+            char tilesetName[256];
+            int walkable;
+
+            if (fscanf(file, "%d %255s %d", &tileId, tilesetName, &walkable) != 3)
+            {
+                std::cerr << "Error reading tile data at position (" << x << ", " << y << ")" << std::endl;
+                fclose(file);
+                return false;
+            }
+
+            if (tileId > 0)
+            {
+                setTile(x, y, tileId, std::string(tilesetName));
+                if (m_tiles[y][x])
+                {
+                    m_tiles[y][x]->setWalkable(walkable != 0);
+                }
+            }
+        }
+    }
+
+    fclose(file);
+    return true;
+}
+
+bool TileMap::saveToFile(const std::string& filename) const
+{
+    FILE* file = fopen(filename.c_str(), "w");
+    if (!file)
+    {
+        std::cerr << "Failed to create file: " << filename << std::endl;
+        return false;
+    }
+
+    fprintf(file, "%d %d %f\n", m_width, m_height, m_tileSize);
+
+    for (int y = 0; y < m_height; ++y)
+    {
+        for (int x = 0; x < m_width; ++x)
+        {
+            if (m_tiles[y][x])
+            {
+                fprintf(file, "%d %s %d ",
+                    m_tiles[y][x]->getTileId(),
+                    m_tiles[y][x]->getTilesetName().c_str(),
+                    m_tiles[y][x]->isWalkable() ? 1 : 0);
+            }
+            else
+            {
+                fprintf(file, "0 default_tileset 1 ");
+            }
+        }
+        fprintf(file, "\n");
+    }
+
+    fclose(file);
+    return true;
 }
