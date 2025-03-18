@@ -47,7 +47,7 @@ void Hero::loadTextures()
     TextureManager& texManager = TextureManager::getInstance();
 
     if (!texManager.hasTexture("player")) 
-        texManager.loadTexture("player", "hero/player.png");
+        texManager.loadTexture("player", "hero\\player.png");
 }
 
 void Hero::initializeAnimations()

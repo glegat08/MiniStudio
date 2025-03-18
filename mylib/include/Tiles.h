@@ -6,6 +6,29 @@
 
 #include "Map.h"
 #include "SceneBase.h"
+#include "TextureManager.h"
+
+using MapRepresentation = std::vector<std::string>;
+
+class View
+{
+public:
+    View(float width_, float height_, float posX_, float posY_) : width(width_), height(height_), posX(posX_), posY(posY_), targetX(posX_), targetY(posY_)
+    {
+    }
+
+    void update();
+
+public:
+    float width;
+    float height;
+    float posX;
+    float posY;
+    float targetX;
+    float targetY;
+    float scale = 1.0f;
+};
+
 
 class TilesMap
 {
@@ -28,8 +51,8 @@ private:
 
     sf::Texture m_texture;
 
-    int m_width;
-    int m_height;
+    int m_width = 0;
+    int m_height = 0;
     int m_tileSize;
 };
 
