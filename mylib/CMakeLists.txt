@@ -43,7 +43,7 @@ set(HEADERS
     ${HEADER_DIR}/HeroState.h
     ${HEADER_DIR}/IEnemy.h
     ${HEADER_DIR}/IGameObject.h
-    ${SOURCE_DIR}/Map.h
+    ${HEADER_DIR}/Map.h
     ${HEADER_DIR}/ObjectBT.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
