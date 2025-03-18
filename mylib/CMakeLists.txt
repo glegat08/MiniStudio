@@ -18,12 +18,14 @@ set(SOURCES
     ${SOURCE_DIR}/HeroState.cpp
     ${SOURCE_DIR}/IEnemy.cpp
     ${SOURCE_DIR}/IGameObject.cpp
+    ${SOURCE_DIR}/Map.cpp
     ${SOURCE_DIR}/ObjectBT.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
     ${SOURCE_DIR}/SceneManager.cpp
     ${SOURCE_DIR}/StateManager.cpp
     ${SOURCE_DIR}/TextureManager.cpp
+    ${SOURCE_DIR}/Tiles.cpp
 )
 
 set(HEADERS
@@ -41,12 +43,14 @@ set(HEADERS
     ${HEADER_DIR}/HeroState.h
     ${HEADER_DIR}/IEnemy.h
     ${HEADER_DIR}/IGameObject.h
+    ${SOURCE_DIR}/Map.h
     ${HEADER_DIR}/ObjectBT.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
     ${HEADER_DIR}/SceneManager.h
     ${HEADER_DIR}/StateManager.h
     ${HEADER_DIR}/TextureManager.h
+    ${HEADER_DIR}/Tiles.h
 )
 
 add_library(${PROJECT_NAME}
