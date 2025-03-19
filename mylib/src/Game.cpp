@@ -47,6 +47,13 @@ void Game::setEnemy()
 	m_gameObjects.push_back(rangedEnemy2);
 }
 
+void Game::setMap()
+{
+	m_map = std::make_shared<TilesMap>(repr);
+
+	std::cout << "Map initialized with size: " << m_map->getWidth() << "x" << m_map->getHeight() << std::endl;
+}
+
 void Game::initialize()
 {
 	Camera::getInstance().initialize(m_renderWindow);
@@ -55,6 +62,7 @@ void Game::initialize()
 	//Camera::getInstance().setWorldBounds(sf::FloatRect(0, 0, 3000, 3000));
 	Camera::getInstance().setInterpolationSpeed(4.0f);
 
+	setMap();
 	setPlayer();
 	setEnemy();
 }
@@ -88,6 +96,11 @@ void Game::update(const float& deltaTime)
 void Game::render()
 {
 	Camera::getInstance().apply();
+
+	if (m_map)
+	{
+		m_map->render(*m_renderWindow);
+	}
 
 	for (auto& gameObject : m_gameObjects)
 	{

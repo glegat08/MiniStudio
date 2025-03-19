@@ -6,29 +6,11 @@
 
 #include "Map.h"
 #include "SceneBase.h"
+#include "PathManager.h"
 #include "TextureManager.h"
 
 using MapRepresentation = std::vector<std::string>;
-
-class View
-{
-public:
-    View(float width_, float height_, float posX_, float posY_) : width(width_), height(height_), posX(posX_), posY(posY_), targetX(posX_), targetY(posY_)
-    {
-    }
-
-    void update();
-
-public:
-    float width;
-    float height;
-    float posX;
-    float posY;
-    float targetX;
-    float targetY;
-    float scale = 1.0f;
-};
-
+extern MapRepresentation repr;
 
 class TilesMap
 {
@@ -41,19 +23,21 @@ public:
 
     int clamp(int min, int max, int val);
 
-    void render(sf::RenderWindow& w, const View& view);
+    void render(sf::RenderWindow& w);
+
+    int getWidth() const { return m_width; }
+    int getHeight() const { return m_height; }
 
 private:
     TileType& getTile(int row, int col) { return m_tiles[row * m_width + col]; }
     const TileType& getTile(int row, int col) const { return m_tiles[row * m_width + col]; }
 
-    std::vector<TileType> m_tiles;
-
     sf::Texture m_texture;
 
-    int m_width = 0;
-    int m_height = 0;
+    int m_width = 32;
+    int m_height = 32;
     int m_tileSize;
+    std::vector<TileType> m_tiles;
 };
 
 //class Tiles

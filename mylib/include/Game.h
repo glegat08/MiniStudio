@@ -1,8 +1,10 @@
 #pragma once
+#include <iostream>
 
 #include "Hero.h"
 #include "SceneBase.h"
 #include "Hero.h"
+#include "Tiles.h"
 
 class Game : public SceneBase
 {
@@ -12,6 +14,7 @@ public:
 
 	void setPlayer();
 	void setEnemy();
+	void setMap();
 	void initialize();
 
 	void processInput(const sf::Event& event) override;
@@ -20,5 +23,6 @@ public:
 
 private:
 	std::shared_ptr<Hero> m_player;
+	std::shared_ptr<TilesMap> m_map;
 	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
 };
