@@ -121,7 +121,7 @@ TilesMap::TilesMap(const MapRepresentation& repr)
         }
     }
 
-    TextureManager::getInstance().loadTexture("herbe2", "Map/herbe2.png");
+    TextureManager::getInstance().loadTexture("herbe2", "Map\\herbe2.png");
 }
 
 sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
@@ -153,7 +153,7 @@ void TilesMap::render(sf::RenderWindow& w)
     TextureManager& texManager = TextureManager::getInstance();
 
     if (!texManager.hasTexture("herbe2")) {
-        texManager.loadTexture("herbe2", "Map/herbe2.png");
+        texManager.loadTexture("herbe2", "Map\\herbe2.png");
     }
 
     sf::Texture* texture = texManager.getTexture("herbe2");
