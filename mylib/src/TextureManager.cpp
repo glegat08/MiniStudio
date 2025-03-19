@@ -140,3 +140,14 @@ std::vector<std::string> TextureManager::getLoadedTextureNames() const
 
     return names;
 }
+
+void TextureManager::loadAllGameTextures()
+{
+    if (!m_initialized)
+        initialize();
+
+    loadTexture("player", "hero\\player.png");
+    loadTexture("enemy", "enemy\\enemy.png");
+
+    std::cout << "All game textures loaded successfully\n";
+}

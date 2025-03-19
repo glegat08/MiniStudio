@@ -68,6 +68,7 @@ public:
 	bool isMovingRight() const;
 
 	friend class CameraTargetAdapter;
+	friend class AttackState;
 
 private:
 	float m_speed;

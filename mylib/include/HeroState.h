@@ -3,6 +3,7 @@
 #include <map>
 #include <string>
 
+enum class stateName;
 class Hero;
 class IState;
 

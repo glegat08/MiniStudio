@@ -1,6 +1,5 @@
 #pragma once
 #include "Composite.h"
-#include "Component.h"
 #include "HeroState.h"
 
 enum class Direction
@@ -30,8 +29,6 @@ public:
     void initialize(const sf::Vector2f& position, const float& size,
         const sf::Color& color, const float& speed);
 
-    void loadTextures();
-    void initializeAnimations();
     void updateAnimationPosition();
 
     void update(const float& deltaTime) override;
@@ -56,12 +53,7 @@ public:
 
     HeroState& getStateManager();
 
-private:
-    void downAnimation();
-    void upAnimation();
-    void rightAnimation();
-    void hurtAnimation();
-    void deathAnimation();
+    void knockBack(const sf::Vector2f& pos, float force);
 
 private:
     int m_health;
@@ -78,21 +70,6 @@ private:
     HeroState m_stateManager;
 
 private:
-    const int idleFrameCount = 2;
-    const int runFrameCount = 2;
-    const int shootFrameCount = 4;
-    const int attackFrameCount = 6;
-    const int hurtFrameCount = 1;
-    const int deathFrameCount = 18;
-
-    const int downRow = 0;
-    const int rightRow = 1;
-    const int upRow = 2;
-    const int deathRow = 3;
-    const int hurtRow = 4;
-
-    const int idleOffset = 0;
-    const int runOffset = idleFrameCount;
-    const int shootOffset = idleFrameCount + runFrameCount;
-    const int attackOffset = idleFrameCount + runFrameCount + shootFrameCount;
+    sf::Vector2f m_knockBack;
+    float m_knockBackDuration = 0.0f;
 };

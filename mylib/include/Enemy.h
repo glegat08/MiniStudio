@@ -12,11 +12,19 @@ public:
     void Attack(float deltaTime) override;
     void Block(float deltaTime) override;
     bool canCounterAttack() const;
+    void configureAnimation();
 
 private:
+    void downAnimation();
+    void sideAnimation();
+    void upAnimation();
+    void hurtSprite();
+    void deathAnimation();
+
     float m_attackCD;
     float m_currentAttackCD;
     bool m_isAttacking;
+    const int rowIndex = 1;
 };
 
 class RangedEnemy : public IEnemy
@@ -31,9 +39,17 @@ public:
     void Block(float deltaTime) override;
     bool isAtOptimalDistance() const;
     void maintainDistance(float deltaTime);
+    void configureAnimation();
 
 private:
+    void downAnimation();
+    void sideAnimation();
+    void upAnimation();
+    void hurtSprite();
+    void deathAnimation();
+
     float m_optimalDistance;
     float m_fireCD;
     float m_currentFireCD;
+    const int rowIndex = 2;
 };
