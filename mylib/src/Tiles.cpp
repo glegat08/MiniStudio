@@ -127,9 +127,7 @@ TilesMap::TilesMap(const MapRepresentation& repr)
 sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
 {
     static std::map<TileType, sf::Vector2i> tileMap = {
-        {'H', {4,  6} }
-      //, {'F', {0,  3} }
-      //, {'T', {12, 6} }
+	    {'H', {4,  6} }
     };
 
     auto it = tileMap.find(tile);
@@ -196,58 +194,3 @@ void TilesMap::render(sf::RenderWindow& w)
         }
     }
 }
-
-//Tiles::Tiles(const std::string& tilesetName)
-//    : m_tilesetName(tilesetName)
-//    , m_tileWidth(32)
-//    , m_tileHeight(32)
-//    , m_columnsCount(0)
-//    , m_rowsCount(0)
-//{
-//}
-//
-//void Tiles::initialize(int tileWidth, int tileHeight)
-//{
-//    m_tileWidth = tileWidth;
-//    m_tileHeight = tileHeight;
-//
-//    sf::Texture* texture = TextureManager::getInstance().getTexture(m_tilesetName);
-//    if (texture)
-//    {
-//        sf::Vector2u texSize = texture->getSize();
-//        m_columnsCount = texSize.x / m_tileWidth;
-//        m_rowsCount = texSize.y / m_tileHeight;
-//    }
-//}
-//
-//sf::IntRect Tiles::getTileRect(int tileId) const
-//{
-//    if (tileId <= 0 || m_columnsCount == 0)
-//        return sf::IntRect(0, 0, 0, 0);
-//
-//    int tileX = (tileId - 1) % m_columnsCount;
-//    int tileY = (tileId - 1) / m_columnsCount;
-//
-//    return sf::IntRect(tileX * m_tileWidth, tileY * m_tileHeight, m_tileWidth, m_tileHeight);
-//}
-//
-//std::string Tiles::getTilesetName() const
-//{
-//    return m_tilesetName;
-//}
-//
-//void Tiles::setTilesetName(const std::string& name)
-//{
-//    m_tilesetName = name;
-//    initialize(m_tileWidth, m_tileHeight);
-//}
-//
-//int Tiles::getTileWidth() const
-//{
-//    return m_tileWidth;
-//}
-//
-//int Tiles::getTileHeight() const
-//{
-//    return m_tileHeight;
-//}
