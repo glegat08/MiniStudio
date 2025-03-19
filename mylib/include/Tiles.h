@@ -31,8 +31,8 @@ private:
 
     sf::Texture m_texture;
 
-    int m_width = 32;
-    int m_height = 32;
+    int m_width;
+    int m_height;
     int m_tileSize;
     std::vector<TileType> m_tiles;
 };
