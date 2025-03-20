@@ -3,7 +3,6 @@
 #include <string>
 #include <SFML/Graphics/RenderWindow.hpp>
 
-#include "Map.h"
 #include "PathManager.h"
 #include "TextureManager.h"
 

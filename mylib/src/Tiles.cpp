@@ -92,9 +92,7 @@ void TilesMap::render(sf::RenderWindow& w)
         sf::Sprite sprite;
         sprite.setTexture(*texture);
 
-        int tileWidthRatio = layerTileSize / m_tileSize;
-        int layerWidth = static_cast<int>(m_layers[layerIndex].tiles.size() /
-            (m_layers[layerIndex].tiles.size() / m_width));
+        int layerWidth = static_cast<int>(m_layers[layerIndex].tiles.size() /(m_layers[layerIndex].tiles.size() / m_width));
         int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
 
         int startRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y - viewSize.y / 2) / layerTileSize));
@@ -148,12 +146,12 @@ sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
     };
 
     static std::map<TileType, sf::Vector2i> tileMap32 = {
-        {'P', {1, 4}}
-        /*,{'I', {1, 0}}
-        ,{'T', {2, 0}}
-        ,{'L', {3, 0}}
-        ,{'V', {0, 1}}
-        ,{'H', {1, 1}} */
+        {'P', {1, 4}},
+        {'I', {1, 0}},
+        {'T', {2, 0}},
+        {'L', {3, 0}},
+        {'V', {0, 1}},
+        {'H', {1, 1}} 
     };
 
     auto it16 = tileMap16.find(tile);

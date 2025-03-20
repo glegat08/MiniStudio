@@ -58,7 +58,7 @@ void Game::setMap()
 
 void Game::setLayer()
 {
-	m_mapLayers = std::make_shared<TilesMap>(path);
+	m_map->addLayer(path, 32);
 
 	std::cout << "Pathlayer has been added. now Map had " << m_map->getLayerCount() << " layers." << std::endl;
 }
@@ -110,6 +110,11 @@ void Game::render()
 	if (m_map)
 	{
 		m_map->render(*m_renderWindow);
+	}
+
+	if (m_mapLayers)
+	{
+		m_mapLayers->render(*m_renderWindow);
 	}
 
 	for (auto& gameObject : m_gameObjects)
