@@ -15,6 +15,7 @@ public:
 	void setPlayer();
 	void setEnemy();
 	void setMap();
+	void setLayer();
 	void initialize();
 
 	void processInput(const sf::Event& event) override;
@@ -24,5 +25,6 @@ public:
 private:
 	std::shared_ptr<Hero> m_player;
 	std::shared_ptr<TilesMap> m_map;
+	std::vector<MapRepresentation> m_mapLayers;
 	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
 };

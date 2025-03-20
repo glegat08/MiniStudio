@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Camera.h"
 #include "Enemy.h"
+#include "Map.h"
 #include "TextureManager.h"
 
 Game::Game(sf::RenderWindow* window, const float& framerate)
@@ -52,6 +53,26 @@ void Game::setMap()
 	m_map = std::make_shared<TilesMap>(repr);
 
 	std::cout << "Map initialized with size: " << m_map->getWidth() << "x" << m_map->getHeight() << std::endl;
+	std::cout << "Map has " << m_map->getLayerCount() << " layers" << std::endl;
+}
+
+void Game::setLayer()
+{
+	if (m_map)
+	{
+		MapRepresentation pathLayer = {
+			"         ",
+			"    V    ",
+			"    V    ",
+			"HHHHIHHH ",
+			"    V    ",
+			"    V    " 
+		};
+
+		m_map->addLayer(pathLayer, 32);
+
+		std::cout << "Couche de chemins ajoutée. La carte a maintenant " << m_map->getLayerCount() << " couches." << std::endl;
+	}
 }
 
 void Game::initialize()
@@ -63,6 +84,7 @@ void Game::initialize()
 	Camera::getInstance().setInterpolationSpeed(4.0f);
 
 	setMap();
+	setLayer();
 	setPlayer();
 	setEnemy();
 }
