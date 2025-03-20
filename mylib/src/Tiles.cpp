@@ -92,8 +92,8 @@ void TilesMap::render(sf::RenderWindow& w)
         sf::Sprite sprite;
         sprite.setTexture(*texture);
 
-        int layerWidth = static_cast<int>(m_layers[layerIndex].tiles.size() /(m_layers[layerIndex].tiles.size() / m_width));
-        int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
+        int layerWidth = m_width;
+    	int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
 
         int startRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y - viewSize.y / 2) / layerTileSize));
         int endRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y + viewSize.y / 2) / layerTileSize) + 1);
