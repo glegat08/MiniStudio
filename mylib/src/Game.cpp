@@ -58,21 +58,9 @@ void Game::setMap()
 
 void Game::setLayer()
 {
-	if (m_map)
-	{
-		MapRepresentation pathLayer = {
-			"         ",
-			"    V    ",
-			"    V    ",
-			"HHHHIHHH ",
-			"    V    ",
-			"    V    " 
-		};
+	m_mapLayers = std::make_shared<TilesMap>(path);
 
-		m_map->addLayer(pathLayer, 32);
-
-		std::cout << "Couche de chemins ajoutée. La carte a maintenant " << m_map->getLayerCount() << " couches." << std::endl;
-	}
+	std::cout << "Pathlayer has been added. now Map had " << m_map->getLayerCount() << " layers." << std::endl;
 }
 
 void Game::initialize()

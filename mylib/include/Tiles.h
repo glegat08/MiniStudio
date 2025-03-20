@@ -10,6 +10,9 @@
 using MapRepresentation = std::vector<std::string>;
 extern MapRepresentation repr;
 
+using LayerRepresentation = std::vector<std::string>;
+extern LayerRepresentation path;
+
 class TilesMap
 {
 public:

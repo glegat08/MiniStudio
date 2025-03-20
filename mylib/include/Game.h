@@ -3,7 +3,7 @@
 
 #include "Hero.h"
 #include "SceneBase.h"
-#include "Hero.h"
+#include "Map.h"
 #include "Tiles.h"
 
 class Game : public SceneBase
@@ -25,6 +25,6 @@ public:
 private:
 	std::shared_ptr<Hero> m_player;
 	std::shared_ptr<TilesMap> m_map;
-	std::vector<MapRepresentation> m_mapLayers;
+	std::shared_ptr<TilesMap> m_mapLayers;
 	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
 };

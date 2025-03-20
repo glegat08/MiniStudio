@@ -254,24 +254,11 @@ MapRepresentation repr = {
     ,"HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHCRRCHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH"
 };
 
-//void MapLoader::AddPaths(std::shared_ptr<TilesMap> map)
-//{
-//    if (map)
-//    {
-//        MapRepresentation pathLayer = CreatePathLayer();
-//        map->addLayer(pathLayer, 32);
-//    }
-//}
-//
-//MapRepresentation MapLoader::CreatePathLayer()
-//{
-//    /*return
-//	{
-//        "         ",
-//        "    V    ",
-//        "    V    ",
-//        "HHHHIHHH ",
-//        "    V    ",
-//        "    V    " 
-//    };*/
-//}
+LayerRepresentation path = {
+         "         "
+        ,"    V    "
+        ,"    V    "
+        ,"HHHHIHHH "
+        ,"    V    "
+        ,"    V    "
+};
