@@ -21,8 +21,9 @@ TilesMap::TilesMap(const MapRepresentation& repr)
 sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
 {
     static std::map<TileType, sf::Vector2i> tileMap = {
-         {'H', {4,  6} }
+         {'H', {0,  3} }
         ,{'C', {9,  2} }
+        ,{'R', {9,  4} }
     };
 
     auto it = tileMap.find(tile);
@@ -45,11 +46,11 @@ void TilesMap::render(sf::RenderWindow& w)
 {
     TextureManager& texManager = TextureManager::getInstance();
 
-    if (!texManager.hasTexture("herbe2")) {
-        texManager.loadTexture("herbe2", "Map\\herbe2.png");
+    if (!texManager.hasTexture("tilemap")) {
+        texManager.loadTexture("tilemap", "Map\\tilemap.png");
     }
 
-    sf::Texture* texture = texManager.getTexture("herbe2");
+    sf::Texture* texture = texManager.getTexture("tilemap");
     if (!texture) {
         std::cerr << "Error: Map texture not found!" << std::endl;
         return;
