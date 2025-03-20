@@ -255,10 +255,9 @@ MapRepresentation repr = {
 };
 
 LayerRepresentation path = {
-         "         "
-        ,"    V    "
-        ,"    V    "
-        ,"HHHHIHHH "
-        ,"    V    "
-        ,"    V    "
+         "..S.....789"
+        ,"..|.....456"
+        ,"[-5-]...123"
+        ,"..|........"
+        ,"..F......+."
 };

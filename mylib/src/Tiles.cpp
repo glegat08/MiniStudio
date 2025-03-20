@@ -1,15 +1,16 @@
 #include <iostream>
 #include "Tiles.h"
 
-TilesMap::TilesMap(const MapRepresentation& repr)
+TilesMap::TilesMap(const std::string& name, const MapRepresentation& repr, int tileSize)
+    : CompositeGameObject(name)
 {
     m_width = static_cast<int>(repr[0].size());
     m_height = static_cast<int>(repr.size());
-    m_tileSize = 16;
+    m_tileSize = tileSize;
 
     m_layers.resize(1);
     m_layers[0].tiles.resize(m_width * m_height);
-    m_layers[0].tileSize = m_tileSize;
+    m_layers[0].tileSize = tileSize;
 
     for (int row = 0; row < m_height; ++row)
     {
@@ -129,7 +130,8 @@ void TilesMap::render(sf::RenderWindow& w)
 
                     w.draw(sprite);
                 }
-                catch (const std::exception& e) {
+                catch (const std::exception& e) 
+                {
                     std::cerr << "Error rendering tile at layer " << layerIndex << " (" << row << "," << col << "): " << e.what() << std::endl;
                 }
             }
@@ -140,18 +142,28 @@ void TilesMap::render(sf::RenderWindow& w)
 sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
 {
     static std::map<TileType, sf::Vector2i> tileMap16 = {
-        {'H', {4, 6}},
-        {'C', {9, 2}},
-        {'R', {9, 4}}
+         {'H', {4, 6}}
+        ,{'C', {9, 2}}
+        ,{'R', {9, 4}}
     };
 
     static std::map<TileType, sf::Vector2i> tileMap32 = {
-        {'P', {1, 4}},
-        {'I', {1, 0}},
-        {'T', {2, 0}},
-        {'L', {3, 0}},
-        {'V', {0, 1}},
-        {'H', {1, 1}} 
+         {'[', {0, 3}}
+        ,{']', {2, 3}}
+        ,{'S', {3, 0}}
+        ,{'F', {3, 2}}
+        ,{'|', {3, 1}}
+        ,{'-', {1, 3}} 
+        ,{'+', {3, 3}} 
+		,{'7', {0, 0}}
+		,{'8', {1, 0}}
+		,{'9', {2, 0}}
+		,{'4', {0, 1}}
+		,{'5', {1, 1}}
+		,{'6', {2, 1}}
+		,{'1', {0, 2}}
+		,{'2', {1, 2}}
+		,{'3', {2, 2}}
     };
 
     auto it16 = tileMap16.find(tile);

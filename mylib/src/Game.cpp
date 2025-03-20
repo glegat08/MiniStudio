@@ -50,17 +50,22 @@ void Game::setEnemy()
 
 void Game::setMap()
 {
-	m_map = std::make_shared<TilesMap>(repr);
+	m_map = std::make_shared<TilesMap>("BaseMap", repr, 16);
 
 	std::cout << "Map initialized with size: " << m_map->getWidth() << "x" << m_map->getHeight() << std::endl;
 	std::cout << "Map has " << m_map->getLayerCount() << " layers" << std::endl;
+
+	m_gameObjects.push_back(m_map);
 }
 
 void Game::setLayer()
 {
-	m_map->addLayer(path, 32);
+	m_mapLayers = std::make_shared<TilesMap>("PathLayer", path, 32);
 
-	std::cout << "Pathlayer has been added. now Map had " << m_map->getLayerCount() << " layers." << std::endl;
+	std::cout << "Pathlayer has been added with size: " << m_mapLayers->getWidth()
+		<< "x" << m_mapLayers->getHeight() << std::endl;
+
+	m_gameObjects.push_back(m_mapLayers);
 }
 
 void Game::initialize()
@@ -107,7 +112,7 @@ void Game::render()
 {
 	Camera::getInstance().apply();
 
-	if (m_map)
+	/*if (m_map)
 	{
 		m_map->render(*m_renderWindow);
 	}
@@ -115,7 +120,7 @@ void Game::render()
 	if (m_mapLayers)
 	{
 		m_mapLayers->render(*m_renderWindow);
-	}
+	}*/
 
 	for (auto& gameObject : m_gameObjects)
 	{
