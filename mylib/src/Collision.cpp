@@ -29,10 +29,10 @@ void Hitbox::update(const float& deltaTime)
 {
 	if (m_owner)
 	{
-		auto renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
-		if (renderer)
+		auto square_renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
+		if (square_renderer)
 		{
-			sf::Vector2f pos = renderer->getPosition() + m_offset;
+			sf::Vector2f pos = square_renderer->getPosition() + m_offset;
 			m_debugShape.setPosition(pos);
 		}
 	}
@@ -96,6 +96,9 @@ void Hitbox::enterCollision(Hitbox* other)
 
 void Hitbox::exitCollision(Hitbox* other)
 {
+	if (!other || !m_exitCollision)
+		return;
+
 	if (m_exitCollision)
 		m_exitCollision(this, other);
 }
@@ -107,63 +110,129 @@ void Hitbox::setDebugDraw(bool debugDraw)
 
 void Hitbox::resolveCollisions(const std::vector<std::shared_ptr<CompositeGameObject>>& gameObjects)
 {
-	std::vector<Hitbox*> hitboxes;
+    std::vector<Hitbox*> hitboxes;
+    std::unordered_map<Hitbox*, bool> hitboxValidity;
 
+    for (const auto& gameObject : gameObjects)
+    {
+        if (!gameObject) continue;
 
-	for (const auto& gameObject : gameObjects)
-	{
-		auto hitbox = static_cast<Hitbox*>(gameObject->getComponent("Hitbox"));
-		if (hitbox)
-			hitboxes.push_back(hitbox);
-	}
+        auto hitbox = static_cast<Hitbox*>(gameObject->getComponent("Hitbox"));
+        if (hitbox)
+        {
+            hitboxes.push_back(hitbox);
+            hitboxValidity[hitbox] = true;
 
-	for (size_t idx = 0; idx < hitboxes.size(); ++idx)
-	{
-		Hitbox* hitboxA = hitboxes[idx];
-		std::vector<Hitbox*> currentCollisions;
+            for (auto iterator = hitbox->m_currentCollisions.begin(); iterator != hitbox->m_currentCollisions.end();)
+            {
+                Hitbox* target = *iterator;
+                if (!target || hitboxValidity.find(target) == hitboxValidity.end())
+                    iterator = hitbox->m_currentCollisions.erase(iterator);
+                else
+                    ++iterator;
+            }
+        }
+    }
 
-		for (size_t jdx = idx + 1; jdx < hitboxes.size(); ++jdx)
-		{
-			Hitbox* hitboxB = hitboxes[jdx];
+    for (size_t idx = 0; idx < hitboxes.size(); ++idx)
+    {
+        Hitbox* hitboxA = hitboxes[idx];
+        std::vector<Hitbox*> currentCollisions;
 
-			if (hitboxA->checkCollision(hitboxB))
-			{
-				currentCollisions.push_back(hitboxB);
+        for (size_t jdx = idx + 1; jdx < hitboxes.size(); ++jdx)
+        {
+            Hitbox* hitboxB = hitboxes[jdx];
 
-				auto iteratorA = std::find(hitboxA->m_currentCollisions.begin(),
-					hitboxA->m_currentCollisions.end(), hitboxB);
+            if (hitboxA->checkCollision(hitboxB))
+            {
+                currentCollisions.push_back(hitboxB);
 
-				if (iteratorA == hitboxA->m_currentCollisions.end())
-				{
-					hitboxA->enterCollision(hitboxB);
-					hitboxB->enterCollision(hitboxA);
-				}
-			}
-		}
+                auto iteratorA = std::find(hitboxA->m_currentCollisions.begin(),
+                    hitboxA->m_currentCollisions.end(), hitboxB);
 
-		for (auto* finishedCollision : hitboxA->m_currentCollisions)
-		{
-			if (std::find(currentCollisions.begin(), currentCollisions.end(), finishedCollision) == currentCollisions.end())
-			{
-				hitboxA->exitCollision(finishedCollision);
-				finishedCollision->exitCollision(hitboxA);
-			}
-		}
+                if (iteratorA == hitboxA->m_currentCollisions.end())
+                {
+                    if (hitboxA->m_enterCollision)
+                    {
+                        try
+                        {
+                            hitboxA->enterCollision(hitboxB);
+                        }
+                        catch (...)
+                        {
+                            hitboxA->m_enterCollision = nullptr;
+                            std::cerr << "Error in enterCollision" << std::endl;
+                        }
+                    }
 
-		hitboxA->m_currentCollisions = currentCollisions;
-	}
+                    if (hitboxB->m_enterCollision)
+                    {
+                        try 
+                        {
+                            hitboxB->enterCollision(hitboxA);
+                        }
+                        catch (...) 
+                        {
+                            hitboxB->m_enterCollision = nullptr;
+                            std::cerr << "Error in enterCollision" << std::endl;
+                        }
+                    }
+                }
+            }
+        }
+
+        for (auto iterator = hitboxA->m_currentCollisions.begin(); iterator != hitboxA->m_currentCollisions.end();)
+        {
+            Hitbox* finishedCollision = *iterator;
+
+            if (std::find(currentCollisions.begin(), currentCollisions.end(), finishedCollision) == currentCollisions.end())
+            {
+                if (hitboxA->m_exitCollision)
+                {
+                    try 
+                    {
+                        hitboxA->exitCollision(finishedCollision);
+                    }
+                    catch (...) 
+                    {
+                        hitboxA->m_exitCollision = nullptr;
+                        std::cerr << "Error in exitCollision" << std::endl;
+                    }
+                }
+
+                if (hitboxValidity.find(finishedCollision) != hitboxValidity.end() && finishedCollision->m_exitCollision)
+                {
+                    try 
+                    {
+                        finishedCollision->exitCollision(hitboxA);
+                    }
+                    catch (...) 
+                    {
+                        finishedCollision->m_exitCollision = nullptr;
+                        std::cerr << "Error in exitCollision" << std::endl;
+                    }
+                }
+
+                iterator = hitboxA->m_currentCollisions.erase(iterator);
+            }
+            else
+                ++iterator;
+        }
+
+        hitboxA->m_currentCollisions = currentCollisions;
+    }
 }
 
 void Hitbox::getBounds(float& minX, float& minY, float& maxX, float& maxY) const
 {
-	auto renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
-	if (!renderer)
+	auto square_renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
+	if (!square_renderer)
 	{
 		minX = minY = maxX = maxY = 0.0f;
 		return;
 	}
 
-	sf::Vector2f pos = renderer->getPosition() + m_offset;
+	sf::Vector2f pos = square_renderer->getPosition() + m_offset;
 
 	minX = pos.x - m_size.x / 2.0f;
 	minY = pos.y - m_size.y / 2.0f;

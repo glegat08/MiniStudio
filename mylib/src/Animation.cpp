@@ -107,6 +107,12 @@ sf::IntRect Animation::getCurrentFrameRect() const
     return { x, y, m_frameSize.x, m_frameSize.y };
 }
 
+
+
+// ANIMATION COMPONENT
+
+
+
 AnimationComponent::AnimationComponent()
     : Component("AnimationComponent")
     , m_currentAnimation("")

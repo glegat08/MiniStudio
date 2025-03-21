@@ -31,7 +31,7 @@ protected:
 class SquareRenderer : public Component
 {
 public:
-	SquareRenderer(float size = 50.0f, const sf::Color& color = sf::Color::Red);
+	SquareRenderer(float size, const sf::Color& color);
 	~SquareRenderer() = default;
 
 	void initialize() override;

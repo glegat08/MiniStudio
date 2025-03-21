@@ -60,6 +60,9 @@ public:
     bool isAnimationFinished() const;
     std::string getCurrentAnimation() const;
 
+    friend class Arrow;
+    friend class BloodEffect;
+
 private:
     std::unordered_map<std::string, Animation> m_animations;
     std::string m_currentAnimation;

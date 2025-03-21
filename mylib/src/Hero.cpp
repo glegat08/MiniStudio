@@ -3,10 +3,12 @@
 #include "Component.h"
 #include "Animation.h"
 #include "Collision.h"
+#include "Effect.h"
 
 Hero::Hero(const std::string& name)
     : CompositeGameObject(name)
     , m_health(100)
+    , m_maxHealth(100)
     , m_armor(0)
     , m_strength(10)
     , m_currentStateName(stateName::idle)
@@ -21,18 +23,18 @@ Hero::Hero(const std::string& name)
 
 void Hero::initialize(const sf::Vector2f& position, const float& size, const sf::Color& color, const float& speed)
 {
-    auto renderer = std::make_shared<SquareRenderer>(size, color);
-    this->addComponent(renderer);
-    renderer->setPosition(position);
+    auto square_renderer = std::make_shared<SquareRenderer>(size, color);
+    this->addComponent(square_renderer);
+    square_renderer->setPosition(position);
 
     auto controller = std::make_shared<PlayerController>(speed);
     addComponent(controller);
 
-    auto animComp = std::make_shared<AnimationComponent>();
-    addComponent(animComp);
+    auto animation_component = std::make_shared<AnimationComponent>();
+    addComponent(animation_component);
 
     auto hitbox = std::make_shared<Hitbox>(sf::Vector2f(60.f, 60.f));
-    hitbox->setDebugDraw(true);
+    hitbox->setDebugDraw(false);
     addComponent(hitbox);
 
     m_speed = speed;
@@ -46,15 +48,15 @@ void Hero::update(const float& deltaTime)
     {
         m_knockBackDuration -= deltaTime;
 
-        auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-        if (renderer)
+        auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+        if (square_renderer)
         {
-            sf::Vector2f currentPos = renderer->getPosition();
+            sf::Vector2f currentPos = square_renderer->getPosition();
 
-            float slowdownFactor = std::min(1.0f, 4.0f * deltaTime);
-            m_knockBack *= (1.0f - slowdownFactor);
+            float slowdown_factor = std::min(1.0f, 4.0f * deltaTime);
+            m_knockBack *= (1.0f - slowdown_factor);
 
-            renderer->setPosition(currentPos + m_knockBack * deltaTime);
+            square_renderer->setPosition(currentPos + m_knockBack * deltaTime);
         }
     }
 
@@ -65,13 +67,13 @@ void Hero::update(const float& deltaTime)
 
 void Hero::updateAnimationPosition()
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
 
-    if (renderer && animComp) 
+    if (square_renderer && animation_component) 
     {
-        sf::Vector2f position = renderer->getPosition();
-        animComp->updatePosition(position);
+        sf::Vector2f position = square_renderer->getPosition();
+        animation_component->updatePosition(position);
     }
 }
 
@@ -86,13 +88,32 @@ bool Hero::isAlive() const
     return m_health > 0;
 }
 
-void Hero::takeDamage(int amount)
+void Hero::takeDamage(int amount, const sf::Vector2f& attackerPos)
 {
     int actualDamage = amount - m_armor;
     if (actualDamage < 1) 
         actualDamage = 1;
 
     m_health -= actualDamage;
+
+auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (square_renderer)
+    {
+        sf::Vector2f position = square_renderer->getPosition();
+        sf::Vector2f entryDirection = position - attackerPos;
+        sf::Vector2f bloodDirection = entryDirection;
+        
+        float length = std::sqrt(bloodDirection.x * bloodDirection.x + bloodDirection.y * bloodDirection.y);
+        if (length > 0)
+        {
+            bloodDirection.x /= length;
+            bloodDirection.y /= length;
+        }
+        else
+            bloodDirection = sf::Vector2f(0, 1);
+            
+        BloodEffect::createBloodEffect(position, bloodDirection);
+    }
 
     if (m_health <= 0) 
     {
@@ -105,21 +126,21 @@ void Hero::takeDamage(int amount)
 
 void Hero::move(const sf::Vector2f& offset)
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (renderer) 
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (square_renderer) 
     {
-        sf::Vector2f currentPos = renderer->getPosition();
-        renderer->setPosition(currentPos + offset);
+        sf::Vector2f currentPos = square_renderer->getPosition();
+        square_renderer->setPosition(currentPos + offset);
     }
 }
 
-void Hero::setDirection(Direction dir)
+void Hero::setDirection(Direction direction)
 {
-    m_currentDirection = dir;
+    m_currentDirection = direction;
 
-    if (dir == Direction::Left) 
+    if (direction == Direction::Left) 
         m_isFacingLeft = true;
-    else if (dir == Direction::Right) 
+    else if (direction == Direction::Right) 
         m_isFacingLeft = false;
 }
 
@@ -157,59 +178,59 @@ void Hero::setState(stateName newState)
 {
     m_currentStateName = newState;
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
-    std::string directionSuffix;
+    std::string direction_suffix;
     switch (m_currentDirection)
     {
     case Direction::Up:
-        directionSuffix = "_up";
+        direction_suffix = "_up";
         break;
     case Direction::Down:
-        directionSuffix = "_down";
+        direction_suffix = "_down";
         break;
     case Direction::Right:
     case Direction::Left:
-        directionSuffix = "_right";
+        direction_suffix = "_right";
         break;
     }
 
     if (newState == stateName::hurt)
     {
-        animComp->playAnimation("hurt");
+        animation_component->playAnimation("hurt");
         return;
     }
 
     if (newState == stateName::death)
     {
-        animComp->playAnimation("death");
+        animation_component->playAnimation("death");
         return;
     }
 
     switch (newState)
     {
     case stateName::idle:
-        animComp->playAnimation("idle" + directionSuffix);
+        animation_component->playAnimation("idle" + direction_suffix);
         break;
     case stateName::run:
-        animComp->playAnimation("run" + directionSuffix);
+        animation_component->playAnimation("run" + direction_suffix);
         break;
     case stateName::attack:
-        animComp->playAnimation("attack" + directionSuffix);
+        animation_component->playAnimation("attack" + direction_suffix);
         break;
     case stateName::shoot:
-        animComp->playAnimation("shoot" + directionSuffix);
+        animation_component->playAnimation("shoot" + direction_suffix);
         break;
     default:
         break;
     }
 
     if (m_isFacingLeft && (m_currentDirection == Direction::Left || m_currentDirection == Direction::Right))
-        animComp->setScale(sf::Vector2f(-2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(-2.0f, 2.0f));
     else
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 float Hero::getSpeed() const
@@ -229,11 +250,18 @@ HeroState& Hero::getStateManager()
 
 void Hero::knockBack(const sf::Vector2f& pos, float force)
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!renderer)
+    if (m_currentStateName == stateName::death)
+    {
+        m_knockBackDuration = 0.f;
+        m_knockBack = sf::Vector2f(0.f, 0.f);
+        return;
+    }
+
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f heroPos = renderer->getPosition();
+    sf::Vector2f heroPos = square_renderer->getPosition();
 
     sf::Vector2f direction = heroPos - pos;
 
@@ -248,4 +276,36 @@ void Hero::knockBack(const sf::Vector2f& pos, float force)
 
     m_knockBack = direction * force;
     m_knockBackDuration = 0.2f;
+}
+
+int Hero::getHealth() const
+{
+    return m_health;
+}
+
+int Hero::getMaxHealth() const
+{
+    return m_maxHealth;
+}
+
+float Hero::getHealthPercentage() const
+{
+    if (m_maxHealth <= 0)
+        return 0.0f;
+
+    return static_cast<float>(m_health) / static_cast<float>(m_maxHealth);
+}
+
+void Hero::setMaxHealth(int maxHealth)
+{
+    m_maxHealth = maxHealth;
+    if (m_health > m_maxHealth)
+        m_health = m_maxHealth;
+}
+
+void Hero::heal(int amount)
+{
+    m_health += amount;
+    if (m_health > m_maxHealth)
+        m_health = m_maxHealth;
 }

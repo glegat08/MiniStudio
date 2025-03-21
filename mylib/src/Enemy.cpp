@@ -5,6 +5,7 @@
 
 #include "Animation.h"
 #include "Collision.h"
+#include "Game.h"
 #include "Hero.h"
 
 // MeleeEnemy
@@ -30,12 +31,12 @@ void MeleeEnemy::init(const sf::Vector2f& pos)
 
     configureAnimation();
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (animComp)
-        animComp->playAnimation("run_down");
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (animation_component)
+        animation_component->playAnimation("run_down");
 
     auto enemyHitbox = std::make_shared<Hitbox>(sf::Vector2f(60.f, 60.f));
-    enemyHitbox->setDebugDraw(true);
+    enemyHitbox->setDebugDraw(false);
     addComponent(enemyHitbox);
 
     changeState(new MeleeEnemyStates::PatrolState());
@@ -78,15 +79,15 @@ void MeleeEnemy::configureAnimation()
     hurtSprite();
     deathAnimation();
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (animComp)
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (animation_component)
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 void MeleeEnemy::downAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -94,18 +95,18 @@ void MeleeEnemy::downAnimation()
     Animation runDownAnim("enemy", runFrameCount, 0.15f);
     runDownAnim.setFrameSize(frameSize);
     runDownAnim.setStartPosition(sf::Vector2i(runDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_down", runDownAnim);
+    animation_component->addAnimation("run_down", runDownAnim);
 
     Animation attackDownAnim("enemy", attackFrameCount, 0.1f, true);
     attackDownAnim.setFrameSize(frameSize);
     attackDownAnim.setStartPosition(sf::Vector2i(attackDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_down", attackDownAnim);
+    animation_component->addAnimation("attack_down", attackDownAnim);
 }
 
 void MeleeEnemy::sideAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -113,18 +114,18 @@ void MeleeEnemy::sideAnimation()
     Animation runRightAnim("enemy", runFrameCount, 0.15f);
     runRightAnim.setFrameSize(frameSize);
     runRightAnim.setStartPosition(sf::Vector2i(runRightOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_right", runRightAnim);
+    animation_component->addAnimation("run_right", runRightAnim);
 
     Animation attackRightAnim("enemy", attackFrameCount, 0.1f, true);
     attackRightAnim.setFrameSize(frameSize);
     attackRightAnim.setStartPosition(sf::Vector2i(attackRightOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_right", attackRightAnim);
+    animation_component->addAnimation("attack_right", attackRightAnim);
 }
 
 void MeleeEnemy::upAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -132,18 +133,18 @@ void MeleeEnemy::upAnimation()
     Animation runUpAnim("enemy", runFrameCount, 0.15f);
     runUpAnim.setFrameSize(frameSize);
     runUpAnim.setStartPosition(sf::Vector2i(runUpOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_up", runUpAnim);
+    animation_component->addAnimation("run_up", runUpAnim);
 
     Animation attackUpAnim("enemy", attackFrameCount, 0.1f, true);
     attackUpAnim.setFrameSize(frameSize);
     attackUpAnim.setStartPosition(sf::Vector2i(attackUpOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_up", attackUpAnim);
+    animation_component->addAnimation("attack_up", attackUpAnim);
 }
 
 void MeleeEnemy::hurtSprite()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -151,13 +152,13 @@ void MeleeEnemy::hurtSprite()
     Animation hurtAnim("enemy", hurtFrameCount, 0.3f, false);
     hurtAnim.setFrameSize(frameSize);
     hurtAnim.setStartPosition(sf::Vector2i(hurtDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("hurt", hurtAnim);
+    animation_component->addAnimation("hurt", hurtAnim);
 }
 
 void MeleeEnemy::deathAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -165,7 +166,7 @@ void MeleeEnemy::deathAnimation()
     Animation deathAnim("enemy", deathFrameCount, 0.2f, false);
     deathAnim.setFrameSize(frameSize);
     deathAnim.setStartPosition(sf::Vector2i(deathOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("death", deathAnim);
+    animation_component->addAnimation("death", deathAnim);
 }
 
 // RangedEnemy
@@ -191,12 +192,12 @@ void RangedEnemy::init(const sf::Vector2f& pos)
 
     configureAnimation();
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (animComp)
-        animComp->playAnimation("run_down");
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (animation_component)
+        animation_component->playAnimation("run_down");
 
     auto rangedEnemyHitbox = std::make_shared<Hitbox>(sf::Vector2f(60.f, 60.f));
-    rangedEnemyHitbox->setDebugDraw(true);
+    rangedEnemyHitbox->setDebugDraw(false);
     addComponent(rangedEnemyHitbox);
 
     changeState(new RangedEnemyStates::PatrolState());
@@ -204,17 +205,48 @@ void RangedEnemy::init(const sf::Vector2f& pos)
 
 void RangedEnemy::Attack(float deltaTime)
 {
-    if (m_currentFireCD > 0)
-    {
-        m_currentFireCD -= deltaTime;
-        return;
-    }
-
     if (isWithinAttackRange() && isAtOptimalDistance())
     {
         std::cout << getName() << " shooting the player!" << std::endl;
 
-        m_currentFireCD = m_fireCD;
+        auto enemy_render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+        if (enemy_render)
+        {
+            sf::Vector2f enemyPos = enemy_render->getPosition();
+
+            sf::Vector2f direction = m_playerPos - enemyPos;
+            float length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+
+            if (length > 0)
+            {
+                direction /= length;
+
+                auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+                if (animation_component)
+                {
+                    std::string animationName;
+                    switch (m_currentDirection)
+                    {
+                    case EnemyDirection::Up:
+                        animationName = "attack_up";
+                        break;
+                    case EnemyDirection::Down:
+                        animationName = "attack_down";
+                        break;
+                    case EnemyDirection::Left:
+                    case EnemyDirection::Right:
+                        animationName = "attack_right";
+                        break;
+                    }
+                    animation_component->playAnimation(animationName);
+                }
+                if (Game::getInstance())
+                {
+                    sf::Vector2f arrowPos = enemyPos + direction * 30.f;
+                    Game::getInstance()->createArrow(arrowPos, direction, m_damage);
+                }
+            }
+        }
     }
 }
 
@@ -228,11 +260,11 @@ bool RangedEnemy::isAtOptimalDistance() const
     if (!canDetectPlayer())
         return false;
 
-    auto renderer = static_cast<const SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!renderer)
+    auto square_renderer = static_cast<const SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return false;
 
-    sf::Vector2f pos = renderer->getPosition();
+    sf::Vector2f pos = square_renderer->getPosition();
     float distanceSq = (pos.x - m_playerPos.x) * (pos.x - m_playerPos.x) +
         (pos.y - m_playerPos.y) * (pos.y - m_playerPos.y);
 
@@ -247,11 +279,11 @@ void RangedEnemy::maintainDistance(float deltaTime)
     if (!canDetectPlayer())
         return;
 
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!renderer)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = renderer->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
     sf::Vector2f direction = m_playerPos - currentPos;
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
@@ -261,9 +293,9 @@ void RangedEnemy::maintainDistance(float deltaTime)
     direction /= distance;
 
     if (distance < m_optimalDistance * 0.8f)
-        renderer->setPosition(currentPos - direction * m_speed * deltaTime);
+        square_renderer->setPosition(currentPos - direction * m_speed * deltaTime);
     else if (distance > m_optimalDistance * 1.2f)
-        renderer->setPosition(currentPos + direction * m_speed * deltaTime);
+        square_renderer->setPosition(currentPos + direction * m_speed * deltaTime);
 }
 
 void RangedEnemy::configureAnimation()
@@ -274,15 +306,15 @@ void RangedEnemy::configureAnimation()
     hurtSprite();
     deathAnimation();
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (animComp)
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (animation_component)
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 void RangedEnemy::downAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -290,18 +322,18 @@ void RangedEnemy::downAnimation()
     Animation runDownAnim("enemy", runFrameCount, 0.15f);
     runDownAnim.setFrameSize(frameSize);
     runDownAnim.setStartPosition(sf::Vector2i(runDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_down", runDownAnim);
+    animation_component->addAnimation("run_down", runDownAnim);
 
     Animation attackDownAnim("enemy", attackFrameCount, 0.1f, true);
     attackDownAnim.setFrameSize(frameSize);
     attackDownAnim.setStartPosition(sf::Vector2i(attackDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_down", attackDownAnim);
+    animation_component->addAnimation("attack_down", attackDownAnim);
 }
 
 void RangedEnemy::sideAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -309,18 +341,18 @@ void RangedEnemy::sideAnimation()
     Animation runRightAnim("enemy", runFrameCount, 0.15f);
     runRightAnim.setFrameSize(frameSize);
     runRightAnim.setStartPosition(sf::Vector2i(runRightOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_right", runRightAnim);
+    animation_component->addAnimation("run_right", runRightAnim);
 
     Animation attackRightAnim("enemy", attackFrameCount, 0.1f, true);
     attackRightAnim.setFrameSize(frameSize);
     attackRightAnim.setStartPosition(sf::Vector2i(attackRightOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_right", attackRightAnim);
+    animation_component->addAnimation("attack_right", attackRightAnim);
 }
 
 void RangedEnemy::upAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -328,18 +360,18 @@ void RangedEnemy::upAnimation()
     Animation runUpAnim("enemy", runFrameCount, 0.15f);
     runUpAnim.setFrameSize(frameSize);
     runUpAnim.setStartPosition(sf::Vector2i(runUpOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("run_up", runUpAnim);
+    animation_component->addAnimation("run_up", runUpAnim);
 
     Animation attackUpAnim("enemy", attackFrameCount, 0.1f, true);
     attackUpAnim.setFrameSize(frameSize);
     attackUpAnim.setStartPosition(sf::Vector2i(attackUpOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("attack_up", attackUpAnim);
+    animation_component->addAnimation("attack_up", attackUpAnim);
 }
 
 void RangedEnemy::hurtSprite()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -347,13 +379,13 @@ void RangedEnemy::hurtSprite()
     Animation hurtAnim("enemy", hurtFrameCount, 0.3f, false);
     hurtAnim.setFrameSize(frameSize);
     hurtAnim.setStartPosition(sf::Vector2i(hurtDownOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("hurt", hurtAnim);
+    animation_component->addAnimation("hurt", hurtAnim);
 }
 
 void RangedEnemy::deathAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -361,5 +393,5 @@ void RangedEnemy::deathAnimation()
     Animation deathAnim("enemy", deathFrameCount, 0.2f, false);
     deathAnim.setFrameSize(frameSize);
     deathAnim.setStartPosition(sf::Vector2i(deathOffset * frameSize.x, rowIndex * frameSize.y));
-    animComp->addAnimation("death", deathAnim);
+    animation_component->addAnimation("death", deathAnim);
 }

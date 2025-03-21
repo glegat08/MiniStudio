@@ -37,10 +37,10 @@ public:
     bool isAlive() const;
     bool isFacingLeft() const;
 
-    void takeDamage(int amount);
+    void takeDamage(int amount, const sf::Vector2f& attackerPos);
     void move(const sf::Vector2f& offset);
     void setFacingLeft(bool left);
-    void setDirection(Direction dir);
+    void setDirection(Direction direction);
     Direction getDirection() const;
 
     void attack();
@@ -55,8 +55,15 @@ public:
 
     void knockBack(const sf::Vector2f& pos, float force);
 
+    int getHealth() const;
+    int getMaxHealth() const;
+    float getHealthPercentage() const;
+    void setMaxHealth(int maxHealth);
+    void heal(int amount);
+
 private:
     int m_health;
+    int m_maxHealth;
     int m_armor;
     int m_strength;
 

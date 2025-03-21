@@ -94,8 +94,8 @@ void IdleState::exitState()
 
 void IdleState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -103,49 +103,49 @@ void IdleState::configureAnimation()
     Animation idleDownAnim("player", idleFrameCount, 0.4f);
     idleDownAnim.setFrameSize(frameSize);
     idleDownAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("idle_down", idleDownAnim);
+    animation_component->addAnimation("idle_down", idleDownAnim);
 
     Animation idleUpAnim("player", idleFrameCount, 0.4f);
     idleUpAnim.setFrameSize(frameSize);
     idleUpAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("idle_up", idleUpAnim);
+    animation_component->addAnimation("idle_up", idleUpAnim);
 
     Animation idleRightAnim("player", idleFrameCount, 0.4f);
     idleRightAnim.setFrameSize(frameSize);
     idleRightAnim.setStartPosition(sf::Vector2i(idleOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("idle_right", idleRightAnim);
+    animation_component->addAnimation("idle_right", idleRightAnim);
 }
 
 void IdleState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     Direction direction = m_owner->getDirection();
     bool isFacingLeft = m_owner->isFacingLeft();
 
-    std::string animName;
+    std::string anim_name;
     switch (direction)
     {
     case Direction::Up:
-        animName = "idle_up";
+        anim_name = "idle_up";
         break;
     case Direction::Down:
-        animName = "idle_down";
+        anim_name = "idle_down";
         break;
     case Direction::Left:
     case Direction::Right:
-        animName = "idle_right";
+        anim_name = "idle_right";
         break;
     }
 
-    animComp->playAnimation(animName);
+    animation_component->playAnimation(anim_name);
 
     if ((direction == Direction::Left || direction == Direction::Right) && isFacingLeft)
-        animComp->setScale(sf::Vector2f(-2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(-2.0f, 2.0f));
     else
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 // Run State Implementation
@@ -220,8 +220,8 @@ void RunState::exitState()
 
 void RunState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -229,49 +229,49 @@ void RunState::configureAnimation()
     Animation runDownAnim("player", runFrameCount, 0.1f);
     runDownAnim.setFrameSize(frameSize);
     runDownAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("run_down", runDownAnim);
+    animation_component->addAnimation("run_down", runDownAnim);
 
     Animation runUpAnim("player", runFrameCount, 0.1f);
     runUpAnim.setFrameSize(frameSize);
     runUpAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("run_up", runUpAnim);
+    animation_component->addAnimation("run_up", runUpAnim);
 
     Animation runRightAnim("player", runFrameCount, 0.1f);
     runRightAnim.setFrameSize(frameSize);
     runRightAnim.setStartPosition(sf::Vector2i(runOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("run_right", runRightAnim);
+    animation_component->addAnimation("run_right", runRightAnim);
 }
 
 void RunState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     Direction direction = m_owner->getDirection();
     bool isFacingLeft = m_owner->isFacingLeft();
 
-    std::string animName;
+    std::string anim_name;
     switch (direction)
     {
     case Direction::Up:
-        animName = "idle_up";
+        anim_name = "idle_up";
         break;
     case Direction::Down:
-        animName = "idle_down";
+        anim_name = "idle_down";
         break;
     case Direction::Left:
     case Direction::Right:
-        animName = "idle_right";
+        anim_name = "idle_right";
         break;
     }
 
-    animComp->playAnimation(animName);
+    animation_component->playAnimation(anim_name);
 
     if ((direction == Direction::Left || direction == Direction::Right) && isFacingLeft)
-        animComp->setScale(sf::Vector2f(-2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(-2.0f, 2.0f));
     else
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 // Attack State Implementation
@@ -284,8 +284,8 @@ AttackState::AttackState(Hero* owner)
 
 void AttackState::enterState()
 {
-    auto controller = static_cast<PlayerController*>(m_owner->getComponent("PlayerController"));
-    if (controller)
+    auto player_controller = static_cast<PlayerController*>(m_owner->getComponent("PlayerController"));
+    if (player_controller)
     {
         m_initialVelocity = sf::Vector2f(0.0f, 0.0f);
         float speed = m_owner->getSpeed() * 0.7f;
@@ -323,14 +323,14 @@ void AttackState::handleInput()
 
 void AttackState::update(float deltaTime)
 {
-    float slowdownFactor = std::exp(-m_decelerationRate * deltaTime);
-    m_initialVelocity *= slowdownFactor;
+    float slowdown_factor = std::exp(-m_decelerationRate * deltaTime);
+    m_initialVelocity *= slowdown_factor;
 
     if (std::abs(m_initialVelocity.x) > 0.5f || std::abs(m_initialVelocity.y) > 0.5f)
         m_owner->move(m_initialVelocity * deltaTime);
 
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (animComp && animComp->isAnimationFinished())
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (animation_component && animation_component->isAnimationFinished())
     {
         bool moving = isGoingLeft() || isGoingRight() || isGoingUp() || isGoingDown();
 
@@ -347,8 +347,8 @@ void AttackState::exitState()
 
 void AttackState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -356,60 +356,60 @@ void AttackState::configureAnimation()
     Animation attackDownAnim("player", attackFrameCount, 0.1f, false);
     attackDownAnim.setFrameSize(frameSize);
     attackDownAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("attack_down", attackDownAnim);
+    animation_component->addAnimation("attack_down", attackDownAnim);
 
     Animation attackUpAnim("player", attackFrameCount, 0.1f, false);
     attackUpAnim.setFrameSize(frameSize);
     attackUpAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("attack_up", attackUpAnim);
+    animation_component->addAnimation("attack_up", attackUpAnim);
 
     Animation attackRightAnim("player", attackFrameCount, 0.1f, false);
     attackRightAnim.setFrameSize(frameSize);
     attackRightAnim.setStartPosition(sf::Vector2i(attackOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("attack_right", attackRightAnim);
+    animation_component->addAnimation("attack_right", attackRightAnim);
 }
 
 void AttackState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     Direction direction = m_owner->getDirection();
     bool isFacingLeft = m_owner->isFacingLeft();
 
-    std::string animName;
+    std::string anim_name;
     switch (direction)
     {
     case Direction::Up:
-        animName = "idle_up";
+        anim_name = "idle_up";
         break;
     case Direction::Down:
-        animName = "idle_down";
+        anim_name = "idle_down";
         break;
     case Direction::Left:
     case Direction::Right:
-        animName = "idle_right";
+        anim_name = "idle_right";
         break;
     }
 
-    animComp->playAnimation(animName);
+    animation_component->playAnimation(anim_name);
 
     if ((direction == Direction::Left || direction == Direction::Right) && isFacingLeft)
-        animComp->setScale(sf::Vector2f(-2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(-2.0f, 2.0f));
     else
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 void AttackState::disableMovement()
 {
-    auto controller = static_cast<PlayerController*>(m_owner->getComponent("PlayerController"));
-    if (controller)
+    auto player_controller = static_cast<PlayerController*>(m_owner->getComponent("PlayerController"));
+    if (player_controller)
     {
-        controller->m_isMovingUp = false;
-        controller->m_isMovingDown = false;
-        controller->m_isMovingLeft = false;
-        controller->m_isMovingRight = false;
+        player_controller->m_isMovingUp = false;
+        player_controller->m_isMovingDown = false;
+        player_controller->m_isMovingLeft = false;
+        player_controller->m_isMovingRight = false;
     }
 }
 
@@ -432,8 +432,8 @@ void ShootState::handleInput()
 
 void ShootState::update(float deltaTime)
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (animComp && animComp->isAnimationFinished()) 
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (animation_component && animation_component->isAnimationFinished()) 
     {
         bool moving = isGoingLeft() || isGoingRight() || isGoingUp() || isGoingDown();
 
@@ -450,8 +450,8 @@ void ShootState::exitState()
 
 void ShootState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -459,50 +459,50 @@ void ShootState::configureAnimation()
     Animation shootDownAnim("player", shootFrameCount, 0.1f, false);
     shootDownAnim.setFrameSize(frameSize);
     shootDownAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, downRow * frameSize.y));
-    animComp->addAnimation("shoot_down", shootDownAnim);
+    animation_component->addAnimation("shoot_down", shootDownAnim);
 
     Animation shootUpAnim("player", shootFrameCount, 0.1f, false);
     shootUpAnim.setFrameSize(frameSize);
     shootUpAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, upRow * frameSize.y));
-    animComp->addAnimation("shoot_up", shootUpAnim);
+    animation_component->addAnimation("shoot_up", shootUpAnim);
 
     Animation shootRightAnim("player", shootFrameCount, 0.1f, false);
     shootRightAnim.setFrameSize(frameSize);
     shootRightAnim.setStartPosition(sf::Vector2i(shootOffset * frameSize.x, rightRow * frameSize.y));
-    animComp->addAnimation("shoot_right", shootRightAnim);
+    animation_component->addAnimation("shoot_right", shootRightAnim);
 
 }
 
 void ShootState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     Direction direction = m_owner->getDirection();
     bool isFacingLeft = m_owner->isFacingLeft();
 
-    std::string animName;
+    std::string anim_name;
     switch (direction)
     {
     case Direction::Up:
-        animName = "idle_up";
+        anim_name = "idle_up";
         break;
     case Direction::Down:
-        animName = "idle_down";
+        anim_name = "idle_down";
         break;
     case Direction::Left:
     case Direction::Right:
-        animName = "idle_right";
+        anim_name = "idle_right";
         break;
     }
 
-    animComp->playAnimation(animName);
+    animation_component->playAnimation(anim_name);
 
     if ((direction == Direction::Left || direction == Direction::Right) && isFacingLeft)
-        animComp->setScale(sf::Vector2f(-2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(-2.0f, 2.0f));
     else
-        animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+        animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 // Hurt State Implementation
@@ -542,8 +542,8 @@ void HurtState::exitState()
 
 void HurtState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -551,18 +551,18 @@ void HurtState::configureAnimation()
     Animation hurtAnim("player", hurtFrameCount, 1.f, false);
     hurtAnim.setFrameSize(frameSize);
     hurtAnim.setStartPosition(sf::Vector2i(0, hurtRow * frameSize.y));
-    animComp->addAnimation("hurt", hurtAnim);
+    animation_component->addAnimation("hurt", hurtAnim);
 }
 
 void HurtState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
-    animComp->playAnimation("hurt");
+    animation_component->playAnimation("hurt");
 
-    animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+    animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }
 
 // Death State Implementation
@@ -591,8 +591,8 @@ void DeathState::exitState()
 
 void DeathState::configureAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
     const sf::Vector2i frameSize(32, 32);
@@ -600,16 +600,16 @@ void DeathState::configureAnimation()
     Animation deathAnim("player", deathFrameCount, 0.2f, false);
     deathAnim.setFrameSize(frameSize);
     deathAnim.setStartPosition(sf::Vector2i(0, deathRow * frameSize.y));
-    animComp->addAnimation("death", deathAnim);
+    animation_component->addAnimation("death", deathAnim);
 }
 
 void DeathState::playStateAnimation()
 {
-    auto animComp = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
-    if (!animComp)
+    auto animation_component = static_cast<AnimationComponent*>(m_owner->getComponent("AnimationComponent"));
+    if (!animation_component)
         return;
 
-    animComp->playAnimation("death");
+    animation_component->playAnimation("death");
 
-    animComp->setScale(sf::Vector2f(2.0f, 2.0f));
+    animation_component->setScale(sf::Vector2f(2.0f, 2.0f));
 }

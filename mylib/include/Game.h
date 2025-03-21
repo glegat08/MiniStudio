@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Arrow.h"
 #include "Collision.h"
 #include "SceneBase.h"
 #include "Hero.h"
@@ -17,6 +18,11 @@ public:
 	void update(const float& deltaTime) override;
 	void render() override;
 
+    static Game* getInstance();
+
+    std::shared_ptr<Arrow> createArrow(const sf::Vector2f& pos, const sf::Vector2f& direction, int damage);
+    void addEffect(std::shared_ptr<CompositeGameObject> effect);
+
 private:
     void setPlayer();
     static std::shared_ptr<Hero> createPlayer();
@@ -29,7 +35,16 @@ private:
     // Enemy-related methods
     void setEnemy();
     void enemyGenerator(int count);
+
+    void cleanupProjectiles();
+    void cleanupEffects();
+
+    void setupHealthUI();
+
 private:
 	std::shared_ptr<Hero> m_player;
+    bool m_deadPlayer;
+
 	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
+    static Game* m_gameInstance;
 };

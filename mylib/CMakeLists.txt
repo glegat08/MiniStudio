@@ -5,10 +5,13 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 set(SOURCES
     ${SOURCE_DIR}/Animation.cpp
+    ${SOURCE_DIR}/Arrow.cpp
+    ${SOURCE_DIR}/Bullet.cpp
     ${SOURCE_DIR}/Camera.cpp
     ${SOURCE_DIR}/Collision.cpp
     ${SOURCE_DIR}/Component.cpp
     ${SOURCE_DIR}/Composite.cpp
+    ${SOURCE_DIR}/Effect.cpp
     ${SOURCE_DIR}/Enemy.cpp
     ${SOURCE_DIR}/EnemyState.cpp
     ${SOURCE_DIR}/Engine.cpp
@@ -18,20 +21,24 @@ set(SOURCES
     ${SOURCE_DIR}/HeroState.cpp
     ${SOURCE_DIR}/IEnemy.cpp
     ${SOURCE_DIR}/IGameObject.cpp
-    ${SOURCE_DIR}/ObjectBT.cpp
+    ${SOURCE_DIR}/Projectile.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
     ${SOURCE_DIR}/SceneManager.cpp
     ${SOURCE_DIR}/StateManager.cpp
     ${SOURCE_DIR}/TextureManager.cpp
+    ${SOURCE_DIR}/UI.cpp
 )
 
 set(HEADERS
     ${HEADER_DIR}/Animation.h
+    ${HEADER_DIR}/Arrow.h
+    ${HEADER_DIR}/Bullet.h
     ${HEADER_DIR}/Camera.h
     ${HEADER_DIR}/Collision.h
     ${HEADER_DIR}/Component.h
     ${HEADER_DIR}/Composite.h
+    ${HEADER_DIR}/Effect.h
     ${HEADER_DIR}/Enemy.h
     ${HEADER_DIR}/EnemyState.h
     ${HEADER_DIR}/Engine.h
@@ -41,12 +48,13 @@ set(HEADERS
     ${HEADER_DIR}/HeroState.h
     ${HEADER_DIR}/IEnemy.h
     ${HEADER_DIR}/IGameObject.h
-    ${HEADER_DIR}/ObjectBT.h
+    ${HEADER_DIR}/Projectile.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
     ${HEADER_DIR}/SceneManager.h
     ${HEADER_DIR}/StateManager.h
     ${HEADER_DIR}/TextureManager.h
+    ${HEADER_DIR}/UI.h
 )
 
 add_library(${PROJECT_NAME}

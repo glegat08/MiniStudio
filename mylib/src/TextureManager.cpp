@@ -54,10 +54,10 @@ bool TextureManager::loadTexture(const std::string& name, const std::string& fil
 
 sf::Texture* TextureManager::getTexture(const std::string& name)
 {
-    auto it = m_textures.find(name);
-    if (it != m_textures.end())
+    auto iterator = m_textures.find(name);
+    if (iterator != m_textures.end())
     {
-        return it->second.get();
+        return iterator->second.get();
     }
 
     std::cerr << "Texture not found: " << name << std::endl;
@@ -66,10 +66,10 @@ sf::Texture* TextureManager::getTexture(const std::string& name)
 
 void TextureManager::removeTexture(const std::string& name)
 {
-    auto it = m_textures.find(name);
-    if (it != m_textures.end())
+    auto iterator = m_textures.find(name);
+    if (iterator != m_textures.end())
     {
-        m_textures.erase(it);
+        m_textures.erase(iterator);
         std::cout << "Removed texture: " << name << std::endl;
     }
 }
@@ -81,10 +81,10 @@ bool TextureManager::hasTexture(const std::string& name) const
 
 sf::Vector2u TextureManager::getTextureDimensions(const std::string& name) const
 {
-    auto it = m_textures.find(name);
-    if (it != m_textures.end())
+    auto iterator = m_textures.find(name);
+    if (iterator != m_textures.end())
     {
-        return it->second->getSize();
+        return iterator->second->getSize();
     }
 
     return sf::Vector2u(0, 0);
@@ -148,6 +148,10 @@ void TextureManager::loadAllGameTextures()
 
     loadTexture("player", "hero\\player.png");
     loadTexture("enemy", "enemy\\enemy.png");
+    loadTexture("arrow", "projectile\\arrow.png");
+    loadTexture("blood", "effect\\blood.png");
+    loadTexture("hero_icons", "hud\\hero_icons.png");
+    loadTexture("health_bar_template", "hud\\health_bar_template.png");
 
     std::cout << "All game textures loaded successfully\n";
 }

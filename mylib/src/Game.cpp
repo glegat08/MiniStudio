@@ -1,15 +1,21 @@
 #include "Game.h"
 
+#include <iostream>
 #include <random>
-
 #include "Camera.h"
 #include "Collision.h"
+#include "Effect.h"
 #include "Enemy.h"
 #include "TextureManager.h"
+#include "UI.h"
+
+Game* Game::m_gameInstance = nullptr;
 
 Game::Game(sf::RenderWindow* window, const float& framerate)
 	: SceneBase(window, framerate)
+	, m_deadPlayer(false)
 {
+	m_gameInstance = this;
 	initialize();
 }
 
@@ -23,6 +29,7 @@ void Game::initialize()
 	Camera::getInstance().setInterpolationSpeed(4.0f);
 
 	setPlayer();
+	setupHealthUI();
 	setEnemy();
 }
 
@@ -38,7 +45,7 @@ void Game::setPlayer()
 
 void Game::setEnemy()
 {
-	enemyGenerator(100);
+	enemyGenerator(10);
 }
 
 std::shared_ptr<Hero> Game::createPlayer()
@@ -76,6 +83,9 @@ void Game::handlePlayerCollision(Hitbox* player, Hitbox* other)
 	if (!hero) 
 		return;
 
+	if (hero->getCurrentState() == stateName::death)
+		return;
+
 	if (enemy->isDead())
 		return;
 
@@ -87,23 +97,23 @@ void Game::handlePlayerCollision(Hitbox* player, Hitbox* other)
 
 void Game::handlePlayerAttackingEnemy(Hero* hero, IEnemy* enemy)
 {
-	auto playerRenderer = static_cast<SquareRenderer*>(hero->getComponent("SquareRenderer"));
-	if (!playerRenderer) 
+	auto player_render = static_cast<SquareRenderer*>(hero->getComponent("SquareRenderer"));
+	if (!player_render)
 		return;
 
-	sf::Vector2f playerPos = playerRenderer->getPosition();
-	enemy->takeDamage(100);
+	sf::Vector2f playerPos = player_render->getPosition();
+	enemy->takeDamage(25, playerPos);
 	enemy->knockBack(playerPos, 600.0f);
 }
 
 void Game::handleEnemyAttackingPlayer(Hero* hero, IEnemy* enemy)
 {
-	auto enemyRenderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-	if (!enemyRenderer)
+	auto enemy_render = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
+	if (!enemy_render)
 		return;
 
-	sf::Vector2f enemyPos = enemyRenderer->getPosition();
-	hero->takeDamage(1);
+	sf::Vector2f enemyPos = enemy_render->getPosition();
+	hero->takeDamage(10, enemyPos);
 	hero->knockBack(enemyPos, 500.0f);
 }
 
@@ -120,16 +130,28 @@ void Game::update(const float& deltaTime)
 
 	for (auto& gameObject : m_gameObjects)
 	{
-		gameObject->update(deltaTime);
+		if (gameObject)
+			gameObject->update(deltaTime);
 	}
 
-	auto playerRender = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
-	if (playerRender)
+	bool isPlayerDead = m_player->getCurrentState() == stateName::death;
+
+	if (isPlayerDead && !m_deadPlayer)
+		IEnemy::heroIsDead(m_gameObjects);
+	else if (!isPlayerDead)
 	{
-		sf::Vector2f playerPos = playerRender->getPosition();
-		IEnemy::updateAllEnemyLOS(m_gameObjects, playerPos);
+		auto player_render = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
+		if (player_render)
+		{
+			sf::Vector2f playerPos = player_render->getPosition();
+			IEnemy::updateAllEnemyLOS(m_gameObjects, playerPos);
+		}
 	}
 
+	m_deadPlayer = isPlayerDead;
+
+	cleanupProjectiles();
+	cleanupEffects();
 	Hitbox::resolveCollisions(m_gameObjects);
 
 	Camera::getInstance().update(deltaTime);
@@ -142,22 +164,27 @@ void Game::render()
 	std::vector<std::shared_ptr<CompositeGameObject>> sortedObjects = m_gameObjects;
 
 	std::sort(sortedObjects.begin(), sortedObjects.end(),
-		[](const std::shared_ptr<CompositeGameObject>& a, const std::shared_ptr<CompositeGameObject>& b) 
+		[](const std::shared_ptr<CompositeGameObject>& a, const std::shared_ptr<CompositeGameObject>& b)
 		{
-			auto rendererA = static_cast<SquareRenderer*>(a->getComponent("SquareRenderer"));
-			auto rendererB = static_cast<SquareRenderer*>(b->getComponent("SquareRenderer"));
+			if (a->getCategory() == "UI")
+				return false; // UI always rendered last
+			if (b->getCategory() == "UI")
+				return true;
 
-			if (!rendererA || !rendererB)
+			auto first_render = static_cast<SquareRenderer*>(a->getComponent("SquareRenderer"));
+			auto second_render = static_cast<SquareRenderer*>(b->getComponent("SquareRenderer"));
+
+			if (!first_render || !second_render)
 				return false;
 
-			float posYA = rendererA->getPosition().y;
-			float posYB = rendererB->getPosition().y;
+			float posYA = first_render->getPosition().y;
+			float posYB = second_render->getPosition().y;
 
 			auto enemyA = dynamic_cast<IEnemy*>(a.get());
 			auto enemyB = dynamic_cast<IEnemy*>(b.get());
 
 			if (enemyA && enemyA->isDead() && (!enemyB || !enemyB->isDead()))
-				return true; 
+				return true;
 
 			if (enemyB && enemyB->isDead() && (!enemyA || !enemyA->isDead()))
 				return false;
@@ -165,20 +192,47 @@ void Game::render()
 			return posYA < posYB;
 		});
 
+	// First render all non-UI game objects with the game camera
 	for (auto& gameObject : sortedObjects)
 	{
-		gameObject->render(*m_renderWindow);
+		if (gameObject->getCategory() != "UI")
+			gameObject->render(*m_renderWindow);
+	}
+
+	// Set back to default view for UI elements
+	sf::View defaultView = m_renderWindow->getDefaultView();
+	m_renderWindow->setView(defaultView);
+
+	// Then render all UI elements with the default camera
+	for (auto& gameObject : sortedObjects)
+	{
+		if (gameObject->getCategory() == "UI")
+			gameObject->render(*m_renderWindow);
 	}
 
 	SceneBase::render();
+}
+
+Game* Game::getInstance()
+{
+	return m_gameInstance;
+}
+
+std::shared_ptr<Arrow> Game::createArrow(const sf::Vector2f& pos, const sf::Vector2f& direction, int damage)
+{
+	auto arrow = std::make_shared<Arrow>("Arrow", damage);
+	arrow->initialize(pos, direction, 400.f);
+
+	m_gameObjects.push_back(arrow);
+	return arrow;
 }
 
 void Game::enemyGenerator(int count)
 {
 	sf::Vector2u windowSize = m_renderWindow->getSize();
 
-	std::random_device rd;
-	std::mt19937 gen(rd());
+	std::random_device random_device;
+	std::mt19937 gen(random_device());
 
 	std::uniform_int_distribution<> randomEnemy(0, 1); // 0 for melee, 1 for ranged
 	std::uniform_real_distribution<float> positionX(windowSize.x * 0.1f, windowSize.x * 0.9f);
@@ -188,10 +242,10 @@ void Game::enemyGenerator(int count)
 	{
 		sf::Vector2f randomPos(positionX(gen), positionY(gen));
 
-		auto playerRenderer = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
-		if (playerRenderer)
+		auto player_renderer = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
+		if (player_renderer)
 		{
-			sf::Vector2f playerPos = playerRenderer->getPosition();
+			sf::Vector2f playerPos = player_renderer->getPosition();
 			sf::Vector2f direction = randomPos - playerPos;
 			float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
@@ -227,4 +281,55 @@ void Game::enemyGenerator(int count)
 
 		m_gameObjects.push_back(enemy);
 	}
+}
+
+void Game::cleanupProjectiles()
+{
+	auto iterator = m_gameObjects.begin();
+	while (iterator != m_gameObjects.end())
+	{
+		if ((*iterator)->getCategory() == "Projectile")
+		{
+			auto projectile = dynamic_cast<IProjectile*>(iterator->get());
+			if (projectile && projectile->isLifeTimePassed())
+			{
+				iterator = m_gameObjects.erase(iterator);
+				continue;
+			}
+		}
+		++iterator;
+	}
+}
+
+void Game::addEffect(std::shared_ptr<CompositeGameObject> effect)
+{
+	m_gameObjects.push_back(effect);
+}
+
+void Game::cleanupEffects()
+{
+	auto iterator = m_gameObjects.begin();
+	while (iterator != m_gameObjects.end())
+	{
+		if ((*iterator)->getCategory() == "Effect")
+		{
+			auto effect = dynamic_cast<BloodEffect*>(iterator->get());
+			if (effect && effect->isFinished())
+			{
+				iterator = m_gameObjects.erase(iterator);
+				continue;
+			}
+		}
+		++iterator;
+	}
+}
+
+void Game::setupHealthUI()
+{
+	auto m_healthUI = std::make_shared<HealthUI>("PlayerHealthUI");
+	m_healthUI->initialize(m_player.get(), 0.25f);
+
+	m_healthUI->setPosition(sf::Vector2f(100.f, 100.f));
+
+	m_gameObjects.push_back(m_healthUI);
 }

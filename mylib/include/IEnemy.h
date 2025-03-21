@@ -34,7 +34,7 @@ public:
     virtual void Attack(float deltaTime) = 0;
     virtual void Block(float deltaTime) = 0;
 
-    void takeDamage(int amount);
+    void takeDamage(int amount, const sf::Vector2f& attackerPos);
     void forgetPlayer();
     void updateLOS(const sf::Vector2f& playerPos);
     static void updateAllEnemyLOS(std::vector<std::shared_ptr<CompositeGameObject>>& gameObjects,
@@ -49,6 +49,8 @@ public:
     bool isNotAttacking() const;
 
     void setSpawnPosition(const sf::Vector2f& pos);
+
+    static void heroIsDead(std::vector<std::shared_ptr<CompositeGameObject>>& gameObjects);
 
 protected:
     int m_health;

@@ -46,14 +46,14 @@ void HeroState::handleInput()
 
 void HeroState::changeState(const std::string& stateName)
 {
-    auto it = m_states.find(stateName);
-    if (it == m_states.end())
+    auto iterator = m_states.find(stateName);
+    if (iterator == m_states.end())
         return;
 
     if (m_currentState)
         m_currentState->exitState();
 
-    m_currentState = it->second.get();
+    m_currentState = iterator->second.get();
     m_currentStateName = stateName;
 
     m_currentState->enterState();

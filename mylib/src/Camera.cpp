@@ -12,9 +12,9 @@ sf::Vector2f CameraTargetAdapter::getPosition() const
     if (!m_owner)
         return { 0.f, 0.f };
 
-    auto* renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
-    if (renderer)
-        return renderer->getPosition();
+    auto* square_renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
+    if (square_renderer)
+        return square_renderer->getPosition();
 
     return { 0.f, 0.f };
 }

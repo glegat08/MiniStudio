@@ -1,5 +1,6 @@
 #include "Component.h"
 #include "Composite.h"
+#include "Hero.h"
 
 Component::Component(const std::string& name)
 	: m_name(name)
@@ -121,8 +122,15 @@ void PlayerController::processInput(const sf::Event& event)
 
 void PlayerController::update(const float& deltaTime)
 {
-    sf::Vector2f currentVelocity = m_velocity;
+    auto hero = dynamic_cast<Hero*>(m_owner);
+    if (hero && hero->getCurrentState() == stateName::death)
+    {
+        m_velocity = sf::Vector2f(0.f, 0.f);
+        return;
+    }
 
+
+    sf::Vector2f currentVelocity = m_velocity;
     sf::Vector2f targetVelocity(0.0f, 0.0f);
 
     if (m_isMovingUp)
@@ -147,12 +155,12 @@ void PlayerController::update(const float& deltaTime)
     m_velocity.x = currentVelocity.x + (targetVelocity.x - currentVelocity.x) * std::min(1.0f, deltaTime * smoothFactor);
     m_velocity.y = currentVelocity.y + (targetVelocity.y - currentVelocity.y) * std::min(1.0f, deltaTime * smoothFactor);
 
-    auto renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
-    if (renderer)
+    auto square_renderer = static_cast<SquareRenderer*>(m_owner->getComponent("SquareRenderer"));
+    if (square_renderer)
     {
-        sf::Vector2f currentPos = renderer->getPosition();
+        sf::Vector2f currentPos = square_renderer->getPosition();
         sf::Vector2f newPos = currentPos + m_velocity * deltaTime;
-        renderer->setPosition(newPos);
+        square_renderer->setPosition(newPos);
     }
 }
 

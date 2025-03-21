@@ -12,9 +12,9 @@ namespace MeleeEnemyStates
     {
         std::cout << enemy->getName() << " start patrol" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PatrolState::update(IEnemy* enemy, float deltaTime)
@@ -37,9 +37,9 @@ namespace MeleeEnemyStates
     {
         std::cout << enemy->getName() << " chasing the player" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void ChaseState::update(IEnemy* enemy, float deltaTime)
@@ -75,9 +75,9 @@ namespace MeleeEnemyStates
         std::cout << enemy->getName() << " attacking the player" << std::endl;
         m_attackTimer = 0.0f;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("attack_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("attack_down");
     }
 
     void AttackState::update(IEnemy* enemy, float deltaTime)
@@ -117,9 +117,9 @@ namespace MeleeEnemyStates
     {
         std::cout << enemy->getName() << " retreat !" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void RetreatState::update(IEnemy* enemy, float deltaTime)
@@ -151,9 +151,9 @@ namespace RangedEnemyStates
     {
         std::cout << enemy->getName() << " start patrol" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PatrolState::update(IEnemy* enemy, float deltaTime)
@@ -176,9 +176,9 @@ namespace RangedEnemyStates
     {
         std::cout << enemy->getName() << " positioning at optimal distance" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PositioningState::update(IEnemy* enemy, float deltaTime)
@@ -218,9 +218,9 @@ namespace RangedEnemyStates
         std::cout << enemy->getName() << " shooting the player" << std::endl;
         m_attackTimer = 0.0f;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("attack_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("attack_down");
     }
 
     void AttackState::update(IEnemy* enemy, float deltaTime)
@@ -264,9 +264,9 @@ namespace RangedEnemyStates
     {
         std::cout << enemy->getName() << " retreat !" << std::endl;
 
-        auto animComp = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
-        if (animComp)
-            animComp->playAnimation("run_down");
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void RetreatState::update(IEnemy* enemy, float deltaTime)

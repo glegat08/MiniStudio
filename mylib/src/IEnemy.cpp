@@ -5,6 +5,8 @@
 
 #include "Animation.h"
 #include "Collision.h"
+#include "Effect.h"
+#include "Enemy.h"
 
 IEnemy::IEnemy(const std::string& name)
     : CompositeGameObject(name)
@@ -40,12 +42,12 @@ IEnemy::~IEnemy()
 void IEnemy::init(const sf::Vector2f& position, const float& size,
     const sf::Color& color, const float& speed)
 {
-    auto renderer = std::make_shared<SquareRenderer>(size, color);
-    addComponent(renderer);
-    renderer->setPosition(position);
+    auto square_renderer = std::make_shared<SquareRenderer>(size, color);
+    addComponent(square_renderer);
+    square_renderer->setPosition(position);
 
-    auto animComp = std::make_shared<AnimationComponent>();
-    addComponent(animComp);
+    auto animation_component = std::make_shared<AnimationComponent>();
+    addComponent(animation_component);
 
     m_speed = speed;
 
@@ -65,15 +67,15 @@ void IEnemy::update(const float& deltaTime)
     {
         m_knockbackDuration -= deltaTime;
 
-        auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-        if (renderer)
+        auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+        if (square_renderer)
         {
-            sf::Vector2f currentPos = renderer->getPosition();
+            sf::Vector2f currentPos = square_renderer->getPosition();
 
-            float slowdownFactor = std::min(1.0f, 3.0f * deltaTime);
-            m_knockBack *= (1.0f - slowdownFactor);
+            float slowdown_factor = std::min(1.0f, 3.0f * deltaTime);
+            m_knockBack *= (1.0f - slowdown_factor);
 
-            renderer->setPosition(currentPos + m_knockBack * deltaTime);
+            square_renderer->setPosition(currentPos + m_knockBack * deltaTime);
         }
     }
     else if (m_currentState)
@@ -100,13 +102,13 @@ void IEnemy::changeState(IEnemyState* newState)
 
 void IEnemy::updateAnimation()
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
 
-    if (renderer && animComp)
+    if (square_renderer && animation_component)
     {
-        sf::Vector2f position = renderer->getPosition();
-        animComp->updatePosition(position);
+        sf::Vector2f position = square_renderer->getPosition();
+        animation_component->updatePosition(position);
     }
 }
 
@@ -115,12 +117,12 @@ void IEnemy::updateVisualDirection()
     if (!m_isPlayerDetected)
         return;
 
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
-    if (!renderer || !animComp)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    if (!square_renderer || !animation_component)
         return;
 
-    sf::Vector2f enemyPos = renderer->getPosition();
+    sf::Vector2f enemyPos = square_renderer->getPosition();
 
     float dx = m_playerPos.x - enemyPos.x;
     float dy = m_playerPos.y - enemyPos.y;
@@ -135,52 +137,52 @@ void IEnemy::updateVisualDirection()
     else if (m_currentDirection == EnemyDirection::Right)
         m_isFacingLeft = false;
 
-    std::string currentAnim = animComp->getCurrentAnimation();
+    std::string current_anim = animation_component->getCurrentAnimation();
     std::string statePrefix;
 
-    size_t underscorePos = currentAnim.find('_');
-    if (underscorePos != std::string::npos)
-        statePrefix = currentAnim.substr(0, underscorePos);
+    size_t underscore_pos = current_anim.find('_');
+    if (underscore_pos != std::string::npos)
+        statePrefix = current_anim.substr(0, underscore_pos);
     else
         statePrefix = "run";
 
-    std::string newAnimName;
+    std::string new_anim_name;
     switch (m_currentDirection)
     {
     case EnemyDirection::Up:
-        newAnimName = statePrefix + "_up";
+        new_anim_name = statePrefix + "_up";
         break;
     case EnemyDirection::Down:
-        newAnimName = statePrefix + "_down";
+        new_anim_name = statePrefix + "_down";
         break;
     case EnemyDirection::Left:
     case EnemyDirection::Right:
-        newAnimName = statePrefix + "_right";
+        new_anim_name = statePrefix + "_right";
         break;
     }
 
-    if (newAnimName != currentAnim)
-        animComp->playAnimation(newAnimName);
+    if (new_anim_name != current_anim)
+        animation_component->playAnimation(new_anim_name);
 
     if ((m_currentDirection == EnemyDirection::Left || m_currentDirection == EnemyDirection::Right))
     {
-        sf::Vector2f scale = animComp->getScale();
+        sf::Vector2f scale = animation_component->getScale();
         float absScale = std::abs(scale.x);
 
         if (m_isFacingLeft)
-            animComp->setScale(sf::Vector2f(-absScale, scale.y));
+            animation_component->setScale(sf::Vector2f(-absScale, scale.y));
         else
-            animComp->setScale(sf::Vector2f(absScale, scale.y));
+            animation_component->setScale(sf::Vector2f(absScale, scale.y));
     }
 }
 
 void IEnemy::knockBack(const sf::Vector2f& pos, float force)
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!renderer)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f enemyPos = renderer->getPosition();
+    sf::Vector2f enemyPos = square_renderer->getPosition();
 
     sf::Vector2f direction = enemyPos - pos;
 
@@ -204,17 +206,40 @@ bool IEnemy::isDead() const
 
 bool IEnemy::isNotAttacking() const
 {
-    auto meleeRetreat = dynamic_cast<const MeleeEnemyStates::RetreatState*>(m_currentState);
-    auto rangedRetreat = dynamic_cast<const RangedEnemyStates::RetreatState*>(m_currentState);
+    auto melee_retreat = dynamic_cast<const MeleeEnemyStates::RetreatState*>(m_currentState);
+    auto ranged_retreat = dynamic_cast<const RangedEnemyStates::RetreatState*>(m_currentState);
 
     auto positioningState = dynamic_cast<const RangedEnemyStates::PositioningState*>(m_currentState);
 
-    return (meleeRetreat != nullptr || rangedRetreat != nullptr || positioningState != nullptr);
+    return (melee_retreat != nullptr || ranged_retreat != nullptr || positioningState != nullptr);
 }
 
 void IEnemy::setSpawnPosition(const sf::Vector2f& pos)
 {
     m_spawnPos = pos;
+}
+
+void IEnemy::heroIsDead(std::vector<std::shared_ptr<CompositeGameObject>>& gameObjects)
+{
+    for (auto& object : gameObjects)
+    {
+        if (object->getCategory() == "Enemy")
+        {
+            auto enemy = dynamic_cast<IEnemy*>(object.get());
+            if (enemy && !enemy->isDead())
+            {
+                enemy->forgetPlayer();
+
+                auto melee_enemy = dynamic_cast<MeleeEnemy*>(enemy);
+                if (melee_enemy)
+                    melee_enemy->changeState(new MeleeEnemyStates::PatrolState());
+
+                auto ranged_enemy = dynamic_cast<RangedEnemy*>(enemy);
+                if (ranged_enemy)
+                    ranged_enemy->changeState(new RangedEnemyStates::PatrolState());
+            }
+        }
+    }
 }
 
 sf::Vector2f IEnemy::randomDirectionGenerator()
@@ -246,11 +271,11 @@ bool IEnemy::canDetectPlayer() const
 
 bool IEnemy::isWithinAttackRange() const
 {
-    auto render = static_cast<const SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!render || !m_isPlayerDetected)
+    auto square_renderer = static_cast<const SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer || !m_isPlayerDetected)
         return false;
 
-    sf::Vector2f pos = render->getPosition();
+    sf::Vector2f pos = square_renderer->getPosition();
     float distance = (pos.x - m_playerPos.x) * (pos.x - m_playerPos.x) +
         (pos.y - m_playerPos.y) * (pos.y - m_playerPos.y);
 
@@ -264,11 +289,11 @@ bool IEnemy::shouldRetreat() const
 
 void IEnemy::patrol(float deltaTime)
 {
-    auto renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!renderer)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = renderer->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
 
     m_timerForPatrol += deltaTime;
 
@@ -278,22 +303,21 @@ void IEnemy::patrol(float deltaTime)
         m_timerForPatrol = 0.f;
     }
 
-    sf::Vector2f toSpawn = m_spawnPos - currentPos;
-    float distToSpawn = std::sqrt(toSpawn.x * toSpawn.x + toSpawn.y * toSpawn.y);
+    sf::Vector2f to_spawn = m_spawnPos - currentPos;
+    float dist_to_spawn = std::sqrt(to_spawn.x * to_spawn.x + to_spawn.y * to_spawn.y);
 
-    if (distToSpawn > m_patrolmaxDistance)
+    if (dist_to_spawn > m_patrolmaxDistance)
     {
-        toSpawn /= distToSpawn;
+        to_spawn /= dist_to_spawn;
 
-        m_currentPatrolDirection = toSpawn * 0.7f + m_currentPatrolDirection * 0.3f;
+        m_currentPatrolDirection = to_spawn * 0.7f + m_currentPatrolDirection * 0.3f;
 
-        // Normaliser
         float length = std::sqrt(m_currentPatrolDirection.x * m_currentPatrolDirection.x + m_currentPatrolDirection.y * m_currentPatrolDirection.y);
         if (length > 0.f)
             m_currentPatrolDirection /= length;
     }
 
-    renderer->setPosition(currentPos + m_currentPatrolDirection * m_speed * deltaTime);
+    square_renderer->setPosition(currentPos + m_currentPatrolDirection * m_speed * deltaTime);
 }
 
 void IEnemy::moveTowardPlayer(float deltaTime)
@@ -301,11 +325,11 @@ void IEnemy::moveTowardPlayer(float deltaTime)
     if (!m_isPlayerDetected)
         return;
 
-    auto render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!render)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = render->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
     sf::Vector2f direction = m_playerPos - currentPos;
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
@@ -316,7 +340,7 @@ void IEnemy::moveTowardPlayer(float deltaTime)
     {
         direction /= distance;
         direction *= m_speed * deltaTime;
-        render->setPosition(currentPos + direction);
+        square_renderer->setPosition(currentPos + direction);
     }
 }
 
@@ -325,11 +349,11 @@ void IEnemy::retreatFromPlayer(float deltaTime)
     if (!m_isPlayerDetected)
         return;
 
-    auto render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!render)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = render->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
     sf::Vector2f direction = currentPos - m_playerPos;
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
@@ -337,17 +361,17 @@ void IEnemy::retreatFromPlayer(float deltaTime)
     {
         direction /= distance;
         direction *= m_speed * 1.2f * deltaTime;
-        render->setPosition(currentPos + direction);
+        square_renderer->setPosition(currentPos + direction);
     }
 }
 
 void IEnemy::searchingArea(float deltaTime)
 {
-    auto render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!render)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = render->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
     sf::Vector2f direction = m_lastKnownPlayerPos - currentPos;
     float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
 
@@ -361,11 +385,11 @@ void IEnemy::searchingArea(float deltaTime)
     {
         direction /= distance;
         direction *= m_speed * deltaTime;
-        render->setPosition(currentPos + direction);
+        square_renderer->setPosition(currentPos + direction);
     }
 }
 
-void IEnemy::takeDamage(int amount)
+void IEnemy::takeDamage(int amount, const sf::Vector2f& attackerPos)
 {
     if (m_isDead)
         return;
@@ -373,14 +397,14 @@ void IEnemy::takeDamage(int amount)
     m_health = std::max(0, m_health - amount);
     std::cout << getName() << " took " << amount << " damage! Health: " << m_health << "/" << m_maxHealth << std::endl;
 
-    auto animComp = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
+    auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
 
     if (m_health <= 0)
     {
         m_isDead = true;
 
-        if (animComp)
-            animComp->playAnimation("death");
+        if (animation_component)
+            animation_component->playAnimation("death");
 
         std::cout << getName() << " has been defeated!" << std::endl;
 
@@ -390,13 +414,28 @@ void IEnemy::takeDamage(int amount)
     }
     else
     {
-        if (animComp)
-            animComp->playAnimation("hurt");
+        if (animation_component)
+            animation_component->playAnimation("hurt");
     }
 
-    auto render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (render)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (square_renderer)
+    {
+        sf::Vector2f position = square_renderer->getPosition();
+
+        sf::Vector2f bloodDirection = position - attackerPos;
+    	float length = std::sqrt(bloodDirection.x * bloodDirection.x + bloodDirection.y * bloodDirection.y);
+        if (length > 0)
+        {
+            bloodDirection.x /= length;
+            bloodDirection.y /= length;
+        }
+        else
+            bloodDirection = sf::Vector2f(0, 1);
+
+        BloodEffect::createBloodEffect(position, bloodDirection);
         updateLOS(m_playerPos);
+    }
 }
 
 void IEnemy::forgetPlayer()
@@ -406,11 +445,11 @@ void IEnemy::forgetPlayer()
 
 void IEnemy::updateLOS(const sf::Vector2f& playerPos)
 {
-    auto render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (!render)
+    auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+    if (!square_renderer)
         return;
 
-    sf::Vector2f currentPos = render->getPosition();
+    sf::Vector2f currentPos = square_renderer->getPosition();
     float distSq = (currentPos.x - playerPos.x) * (currentPos.x - playerPos.x) +
         (currentPos.y - playerPos.y) * (currentPos.y - playerPos.y);
 
@@ -432,11 +471,11 @@ void IEnemy::updateLOS(const sf::Vector2f& playerPos)
 void IEnemy::updateAllEnemyLOS(std::vector<std::shared_ptr<CompositeGameObject>>& gameObjects,
     const sf::Vector2f& playerPos)
 {
-    for (auto& obj : gameObjects)
+    for (auto& object : gameObjects)
     {
-        if (obj->getCategory() == "Enemy")
+        if (object->getCategory() == "Enemy")
         {
-            auto enemy = dynamic_cast<IEnemy*>(obj.get());
+            auto enemy = dynamic_cast<IEnemy*>(object.get());
             if (enemy)
                 enemy->updateLOS(playerPos);
         }
