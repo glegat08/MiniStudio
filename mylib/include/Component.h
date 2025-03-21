@@ -31,7 +31,7 @@ protected:
 class SquareRenderer : public Component
 {
 public:
-	SquareRenderer(float size = 50.0f, const sf::Color& color = sf::Color::Red);
+	SquareRenderer(float size, const sf::Color& color);
 	~SquareRenderer() = default;
 
 	void initialize() override;
@@ -68,6 +68,7 @@ public:
 	bool isMovingRight() const;
 
 	friend class CameraTargetAdapter;
+	friend class AttackState;
 
 private:
 	float m_speed;

@@ -34,6 +34,8 @@ public:
 
     std::vector<std::string> getLoadedTextureNames() const;
 
+    void loadAllGameTextures();
+
 private:
     TextureManager();
     ~TextureManager();

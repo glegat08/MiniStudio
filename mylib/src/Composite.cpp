@@ -38,27 +38,27 @@ void CompositeGameObject::addComponent(std::shared_ptr<Component> component)
 
 Component* CompositeGameObject::getComponent(const std::string& name)
 {
-	auto it = m_components.find(name);
-	if (it != m_components.end())
-		return it->second.get();
+	auto iterator = m_components.find(name);
+	if (iterator != m_components.end())
+		return iterator->second.get();
 
 	return nullptr;
 }
 
 const Component* CompositeGameObject::getComponent(const std::string& name) const
 {
-	auto it = m_components.find(name);
-	if (it != m_components.end())
-		return it->second.get();
+	auto iterator = m_components.find(name);
+	if (iterator != m_components.end())
+		return iterator->second.get();
 
 	return nullptr;
 }
 
 void CompositeGameObject::removeComponent(const std::string& name)
 {
-	auto it = m_components.find(name);
-	if (it != m_components.end())
-		m_components.erase(it);
+	auto iterator = m_components.find(name);
+	if (iterator != m_components.end())
+		m_components.erase(iterator);
 }
 
 

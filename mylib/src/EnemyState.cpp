@@ -2,18 +2,19 @@
 
 #include <iostream>
 
+#include "Animation.h"
 #include "Component.h"
 #include "Enemy.h"
 
 namespace MeleeEnemyStates
 {
-    void PatrolState::enter(IEnemy* enemy)
+    void PatrolState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " start patrol" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(200, 50, 50));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PatrolState::update(IEnemy* enemy, float deltaTime)
@@ -27,18 +28,18 @@ namespace MeleeEnemyStates
         }
     }
 
-    void PatrolState::exit(IEnemy* enemy)
+    void PatrolState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stopped patrol" << std::endl;
     }
 
-    void ChaseState::enter(IEnemy* enemy)
+    void ChaseState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " chasing the player" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(220, 80, 80));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void ChaseState::update(IEnemy* enemy, float deltaTime)
@@ -64,19 +65,19 @@ namespace MeleeEnemyStates
         enemy->moveTowardPlayer(deltaTime);
     }
 
-    void ChaseState::exit(IEnemy* enemy)
+    void ChaseState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stopped chasing" << std::endl;
     }
 
-    void AttackState::enter(IEnemy* enemy)
+    void AttackState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " attacking the player" << std::endl;
         m_attackTimer = 0.0f;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color::Red);
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("attack_down");
     }
 
     void AttackState::update(IEnemy* enemy, float deltaTime)
@@ -107,18 +108,18 @@ namespace MeleeEnemyStates
         }
     }
 
-    void AttackState::exit(IEnemy* enemy)
+    void AttackState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stopped attacking" << std::endl;
     }
 
-    void RetreatState::enter(IEnemy* enemy)
+    void RetreatState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " retreat !" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(100, 0, 0));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void RetreatState::update(IEnemy* enemy, float deltaTime)
@@ -138,7 +139,7 @@ namespace MeleeEnemyStates
         }
     }
 
-    void RetreatState::exit(IEnemy* enemy)
+    void RetreatState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stop retreat" << std::endl;
     }
@@ -146,13 +147,13 @@ namespace MeleeEnemyStates
 
 namespace RangedEnemyStates
 {
-    void PatrolState::enter(IEnemy* enemy)
+    void PatrolState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " start patrol" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(50, 150, 200));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PatrolState::update(IEnemy* enemy, float deltaTime)
@@ -166,18 +167,18 @@ namespace RangedEnemyStates
         }
     }
 
-    void PatrolState::exit(IEnemy* enemy)
+    void PatrolState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stopped patrol" << std::endl;
     }
 
-    void PositioningState::enter(IEnemy* enemy)
+    void PositioningState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " positioning at optimal distance" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(100, 180, 255));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void PositioningState::update(IEnemy* enemy, float deltaTime)
@@ -207,19 +208,19 @@ namespace RangedEnemyStates
         rangedEnemy->maintainDistance(deltaTime);
     }
 
-    void PositioningState::exit(IEnemy* enemy)
+    void PositioningState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " found player position" << std::endl;
     }
 
-    void AttackState::enter(IEnemy* enemy)
+    void AttackState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " shooting the player" << std::endl;
         m_attackTimer = 0.0f;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color::Cyan);
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("attack_down");
     }
 
     void AttackState::update(IEnemy* enemy, float deltaTime)
@@ -254,18 +255,18 @@ namespace RangedEnemyStates
         }
     }
 
-    void AttackState::exit(IEnemy* enemy)
+    void AttackState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stopped shooting" << std::endl;
     }
 
-    void RetreatState::enter(IEnemy* enemy)
+    void RetreatState::enterState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " retreat !" << std::endl;
 
-        auto renderer = static_cast<SquareRenderer*>(enemy->getComponent("SquareRenderer"));
-        if (renderer)
-            renderer->setColor(sf::Color(0, 50, 100));
+        auto animation_component = static_cast<AnimationComponent*>(enemy->getComponent("AnimationComponent"));
+        if (animation_component)
+            animation_component->playAnimation("run_down");
     }
 
     void RetreatState::update(IEnemy* enemy, float deltaTime)
@@ -285,7 +286,7 @@ namespace RangedEnemyStates
         }
     }
 
-    void RetreatState::exit(IEnemy* enemy)
+    void RetreatState::exitState(IEnemy* enemy)
     {
         std::cout << enemy->getName() << " stop retreat" << std::endl;
     }

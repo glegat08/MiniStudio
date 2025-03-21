@@ -104,8 +104,14 @@ sf::IntRect Animation::getCurrentFrameRect() const
     int x = m_startPosition.x + (m_currentFrame * m_frameSize.x);
     int y = m_startPosition.y;
 
-    return sf::IntRect(x, y, m_frameSize.x, m_frameSize.y);
+    return { x, y, m_frameSize.x, m_frameSize.y };
 }
+
+
+
+// ANIMATION COMPONENT
+
+
 
 AnimationComponent::AnimationComponent()
     : Component("AnimationComponent")

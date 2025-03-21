@@ -7,9 +7,9 @@ class IEnemyState
 public:
     virtual ~IEnemyState() = default;
 
-    virtual void enter(IEnemy* enemy) = 0;
+    virtual void enterState(IEnemy* enemy) = 0;
     virtual void update(IEnemy* enemy, float deltaTime) = 0;
-    virtual void exit(IEnemy* enemy) = 0;
+    virtual void exitState(IEnemy* enemy) = 0;
 };
 
 namespace MeleeEnemyStates
@@ -17,25 +17,25 @@ namespace MeleeEnemyStates
     class PatrolState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 
     class ChaseState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 
     class AttackState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
 
     private:
         float m_attackTimer = 0.0f;
@@ -45,9 +45,9 @@ namespace MeleeEnemyStates
     class RetreatState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 }
 
@@ -56,25 +56,25 @@ namespace RangedEnemyStates
     class PatrolState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 
     class PositioningState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 
     class AttackState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
 
     private:
         float m_attackTimer = 0.0f;
@@ -84,8 +84,8 @@ namespace RangedEnemyStates
     class RetreatState : public IEnemyState
     {
     public:
-        void enter(IEnemy* enemy) override;
+        void enterState(IEnemy* enemy) override;
         void update(IEnemy* enemy, float deltaTime) override;
-        void exit(IEnemy* enemy) override;
+        void exitState(IEnemy* enemy) override;
     };
 }

@@ -9,10 +9,13 @@ public:
     IState(Hero* owner);
     virtual ~IState() = default;
 
-    virtual void enter() = 0;
+    virtual void enterState() = 0;
     virtual void handleInput() = 0;
     virtual void update(float deltaTime) = 0;
-    virtual void exit() = 0;
+    virtual void exitState() = 0;
+
+    virtual void configureAnimation() = 0;
+    virtual void playStateAnimation() = 0;
 
 protected:
     bool isGoingLeft() const;
@@ -26,6 +29,26 @@ protected:
 
     Hero* m_owner;
     static bool m_mouseLeftPressed;
+
+    const int idleFrameCount = 2;
+    const int runFrameCount = 4;
+    const int shootFrameCount = 6;
+    const int attackFrameCount = 6;
+    const int hurtFrameCount = 1;
+    const int deathFrameCount = 19;
+
+    const int downRow = 0;
+    const int rightRow = 1;
+    const int upRow = 2;
+    const int deathRow = 3;
+    const int hurtRow = 4;
+
+    const int idleOffset = 0;
+    const int runOffset = idleFrameCount;
+    const int shootOffset = runOffset + runFrameCount;
+    const int attackOffset = shootOffset + shootFrameCount;
+    const int deathOffset = attackOffset + attackFrameCount;
+    const int hurtOffset = deathOffset + deathFrameCount;
 };
 
 // State implementations
@@ -33,10 +56,13 @@ class IdleState : public IState
 {
 public:
     IdleState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
 
 private:
     sf::Clock m_animClock;
@@ -46,10 +72,13 @@ class RunState : public IState
 {
 public:
     RunState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
 
 private:
     sf::Clock m_animClock;
@@ -59,23 +88,33 @@ class AttackState : public IState
 {
 public:
     AttackState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
+
+    void disableMovement();
 
 private:
     sf::Clock m_animClock;
+    sf::Vector2f m_initialVelocity;
+    float m_decelerationRate;
 };
 
 class ShootState : public IState
 {
 public:
     ShootState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
 
 private:
     sf::Clock m_animClock;
@@ -85,10 +124,13 @@ class HurtState : public IState
 {
 public:
     HurtState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
 
 private:
     sf::Clock m_animClock;
@@ -99,10 +141,13 @@ class DeathState : public IState
 {
 public:
     DeathState(Hero* owner);
-    void enter() override;
+    void enterState() override;
     void handleInput() override;
     void update(float deltaTime) override;
-    void exit() override;
+    void exitState() override;
+
+    void configureAnimation() override;
+    void playStateAnimation() override;
 
 private:
     sf::Clock m_animClock;

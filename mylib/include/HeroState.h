@@ -4,6 +4,7 @@
 #include <string>
 #include "StateManager.h"
 
+enum class stateName;
 class Hero;
 class IState;
 

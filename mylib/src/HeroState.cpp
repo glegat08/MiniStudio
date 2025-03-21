@@ -24,6 +24,11 @@ void HeroState::initialize()
     m_states["Hurt"] = std::make_unique<HurtState>(m_owner);
     m_states["Death"] = std::make_unique<DeathState>(m_owner);
 
+    for (auto& state : m_states)
+    {
+        state.second->configureAnimation();
+    }
+
     changeState("Idle");
 }
 
@@ -41,17 +46,17 @@ void HeroState::handleInput()
 
 void HeroState::changeState(const std::string& stateName)
 {
-    auto it = m_states.find(stateName);
-    if (it == m_states.end())
+    auto iterator = m_states.find(stateName);
+    if (iterator == m_states.end())
         return;
 
     if (m_currentState)
-        m_currentState->exit();
+        m_currentState->exitState();
 
-    m_currentState = it->second.get();
+    m_currentState = iterator->second.get();
     m_currentStateName = stateName;
 
-    m_currentState->enter();
+    m_currentState->enterState();
 }
 
 std::string HeroState::getCurrentStateName() const
