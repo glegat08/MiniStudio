@@ -1,24 +1,17 @@
 #pragma once
-#include <iostream>
 #include "Arrow.h"
-#include "Collision.h"
 #include "SceneBase.h"
 #include "Hero.h"
-#include "IEnemy.h"
-#include "Map.h"
 #include "Tiles.h"
+
+class IEnemy;
+class Hitbox;
 
 class Game : public SceneBase
 {
 public:
 	Game(sf::RenderWindow* window, const float& framerate);
 	~Game() = default;
-
-	void setPlayer();
-	void setEnemy();
-	void setMap();
-	void setLayer();
-	void initialize();
 
 	void processInput(const sf::Event& event) override;
 	void update(const float& deltaTime) override;
@@ -30,6 +23,8 @@ public:
     void addEffect(std::shared_ptr<CompositeGameObject> effect);
 
 private:
+    void initialize();
+
     void setPlayer();
     static std::shared_ptr<Hero> createPlayer();
     void addCameraToPlayer();
@@ -47,6 +42,9 @@ private:
 
     void setupHealthUI();
 
+    void setMap();
+    void setLayer();
+
 private:
 	std::shared_ptr<Hero> m_player;
     bool m_deadPlayer;
@@ -56,5 +54,4 @@ private:
 
 	std::shared_ptr<TilesMap> m_map;
 	std::shared_ptr<TilesMap> m_mapLayers;
-	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
 };

@@ -23,7 +23,6 @@ set(SOURCES
     ${SOURCE_DIR}/IGameObject.cpp
     ${SOURCE_DIR}/Projectile.cpp
     ${SOURCE_DIR}/Map.cpp
-    ${SOURCE_DIR}/ObjectBT.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
     ${SOURCE_DIR}/SceneManager.cpp
@@ -53,7 +52,6 @@ set(HEADERS
     ${HEADER_DIR}/IGameObject.h
     ${HEADER_DIR}/Projectile.h
     ${HEADER_DIR}/Map.h
-    ${HEADER_DIR}/ObjectBT.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
     ${HEADER_DIR}/SceneManager.h

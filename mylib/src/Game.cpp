@@ -2,11 +2,11 @@
 
 #include <iostream>
 #include <random>
+
 #include "Camera.h"
 #include "Collision.h"
 #include "Effect.h"
 #include "Enemy.h"
-#include "Map.h"
 #include "TextureManager.h"
 #include "UI.h"
 
@@ -26,14 +26,14 @@ void Game::initialize()
 	TextureManager::getInstance().loadAllGameTextures();
 
 	Camera::getInstance().initialize(m_renderWindow);
-	Camera::getInstance().setZoom(1.f);
+	Camera::getInstance().setZoom(1.5f);
 	Camera::getInstance().setInterpolationSpeed(4.0f);
 
+	setMap();
+	setLayer();
 	setPlayer();
 	setupHealthUI();
 	setEnemy();
-  setMap();
-  setLayer();
 }
 
 void Game::setPlayer()
@@ -54,7 +54,7 @@ void Game::setEnemy()
 std::shared_ptr<Hero> Game::createPlayer()
 {
 	auto player = std::make_shared<Hero>("Player");
-	player->initialize(sf::Vector2f(400.f, 300.f), 50.f, sf::Color::Transparent, 300.f);
+	player->initialize(sf::Vector2f(1000.f, 1000.f), 50.f, sf::Color::Transparent, 300.f);
 	return player;
 }
 
@@ -260,8 +260,8 @@ void Game::enemyGenerator(int count)
 	std::mt19937 gen(random_device());
 
 	std::uniform_int_distribution<> randomEnemy(0, 1); // 0 for melee, 1 for ranged
-	std::uniform_real_distribution<float> positionX(windowSize.x * 0.1f, windowSize.x * 0.9f);
-	std::uniform_real_distribution<float> positionY(windowSize.y * 0.1f, windowSize.y * 0.9f);
+	std::uniform_real_distribution<float> positionX(windowSize.x * 0.2f, windowSize.x * 1.5f);
+	std::uniform_real_distribution<float> positionY(windowSize.y * 0.2f, windowSize.y * 1.5f);
 
 	for (int i = 0; i < count; i++)
 	{
@@ -276,14 +276,14 @@ void Game::enemyGenerator(int count)
 
 			if (distance < 150.0f)
 			{
-				if (distance > 0.1f) 
+				if (distance > 0.1f)
 				{
 					direction /= distance;
 					randomPos = playerPos + direction * 150.0f;
 				}
 				else
 				{
-					randomPos = playerPos + sf::Vector2f(150.0f, 0.0f);
+					randomPos = playerPos + sf::Vector2f(10.0f, 100.0f);
 				}
 			}
 		}

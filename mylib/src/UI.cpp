@@ -32,7 +32,7 @@ void HealthUI::initialize(Hero* hero, float scale)
     loadTextures();
 
     m_healthBarSize.x = m_healthBarSize.x * 0.35f;
-    m_healthBarSize.y = m_healthBarSize.y * 0.1f;
+    m_healthBarSize.y = m_healthBarSize.y * 0.12f;
 
     m_healthBarFill.setSize(sf::Vector2f(m_healthBarSize.x, m_healthBarSize.y));
     m_healthBarFill.setFillColor(sf::Color(50, 255, 50, 230));
