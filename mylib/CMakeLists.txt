@@ -22,6 +22,8 @@ set(SOURCES
     ${SOURCE_DIR}/IEnemy.cpp
     ${SOURCE_DIR}/IGameObject.cpp
     ${SOURCE_DIR}/Projectile.cpp
+    ${SOURCE_DIR}/Map.cpp
+    ${SOURCE_DIR}/ObjectBT.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
     ${SOURCE_DIR}/SceneManager.cpp
@@ -29,7 +31,6 @@ set(SOURCES
     ${SOURCE_DIR}/TextureManager.cpp
     ${SOURCE_DIR}/UI.cpp
     ${SOURCE_DIR}/Tiles.cpp
-    ${SOURCE_DIR}/Map.cpp
 )
 
 set(HEADERS
@@ -51,6 +52,8 @@ set(HEADERS
     ${HEADER_DIR}/IEnemy.h
     ${HEADER_DIR}/IGameObject.h
     ${HEADER_DIR}/Projectile.h
+    ${HEADER_DIR}/Map.h
+    ${HEADER_DIR}/ObjectBT.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
     ${HEADER_DIR}/SceneManager.h
@@ -58,7 +61,6 @@ set(HEADERS
     ${HEADER_DIR}/TextureManager.h
     ${HEADER_DIR}/UI.h
     ${HEADER_DIR}/Tiles.h
-    ${HEADER_DIR}/Map.h
 )
 
 add_library(${PROJECT_NAME}

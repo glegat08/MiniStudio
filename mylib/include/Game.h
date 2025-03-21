@@ -1,10 +1,12 @@
 #pragma once
-
+#include <iostream>
 #include "Arrow.h"
 #include "Collision.h"
 #include "SceneBase.h"
 #include "Hero.h"
 #include "IEnemy.h"
+#include "Map.h"
+#include "Tiles.h"
 
 class Game : public SceneBase
 {
@@ -12,6 +14,10 @@ public:
 	Game(sf::RenderWindow* window, const float& framerate);
 	~Game() = default;
 
+	void setPlayer();
+	void setEnemy();
+	void setMap();
+	void setLayer();
 	void initialize();
 
 	void processInput(const sf::Event& event) override;
@@ -47,4 +53,8 @@ private:
 
 	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
     static Game* m_gameInstance;
+
+	std::shared_ptr<TilesMap> m_map;
+	std::shared_ptr<TilesMap> m_mapLayers;
+	std::vector<std::shared_ptr<CompositeGameObject>> m_gameObjects;
 };

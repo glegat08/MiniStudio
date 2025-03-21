@@ -27,7 +27,7 @@ public:
     ~Hero() = default;
 
     void initialize(const sf::Vector2f& position, const float& size,
-        const sf::Color& color, const float& speed);
+    const sf::Color& color, const float& speed);
 
     void updateAnimationPosition();
 

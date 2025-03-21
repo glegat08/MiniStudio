@@ -6,6 +6,7 @@
 #include "Collision.h"
 #include "Effect.h"
 #include "Enemy.h"
+#include "Map.h"
 #include "TextureManager.h"
 #include "UI.h"
 
@@ -31,6 +32,8 @@ void Game::initialize()
 	setPlayer();
 	setupHealthUI();
 	setEnemy();
+  setMap();
+  setLayer();
 }
 
 void Game::setPlayer()
@@ -93,6 +96,28 @@ void Game::handlePlayerCollision(Hitbox* player, Hitbox* other)
 		handlePlayerAttackingEnemy(hero, enemy);
 	else if (!enemy->isNotAttacking())
 		handleEnemyAttackingPlayer(hero, enemy);
+}
+
+void Game::setMap()
+{
+	m_map = std::make_shared<TilesMap>("BaseMap", repr, 16);
+
+	std::cout << "Map initialized with size: " << m_map->getWidth() << "x" << m_map->getHeight() << std::endl;
+	std::cout << "Map has " << m_map->getLayerCount() << " layers" << std::endl;
+
+	m_gameObjects.push_back(m_map);
+}
+
+void Game::setLayer()
+{
+	m_mapLayers = std::make_shared<TilesMap>("PathLayer", path, 32);
+
+	m_mapLayers->setScale(4.0f, 4.0f);
+
+	std::cout << "Pathlayer has been added with size: " << m_mapLayers->getWidth()
+		<< "x" << m_mapLayers->getHeight() << std::endl;
+
+	m_gameObjects.push_back(m_mapLayers);
 }
 
 void Game::handlePlayerAttackingEnemy(Hero* hero, IEnemy* enemy)

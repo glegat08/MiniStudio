@@ -4,6 +4,8 @@
 #include <SFML/Audio.hpp>
 #include <SFML/Window.hpp>
 
+class CompositeGameObject;
+
 class SceneBase
 {
 public:

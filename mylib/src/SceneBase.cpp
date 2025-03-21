@@ -1,6 +1,5 @@
 #include "SceneBase.h"
 
-#include "SceneBase.h"
 #include <algorithm>
 
 SceneBase* SceneBase::m_currentScene = nullptr;

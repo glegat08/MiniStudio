@@ -1,6 +1,11 @@
 #include "Component.h"
+
+#include <iostream>
+
 #include "Composite.h"
 #include "Hero.h"
+#include "PathManager.h"
+#include "TextureManager.h"
 
 Component::Component(const std::string& name)
 	: m_name(name)
