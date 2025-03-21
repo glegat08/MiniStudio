@@ -93,8 +93,13 @@ void TilesMap::render(sf::RenderWindow& w)
         sf::Sprite sprite;
         sprite.setTexture(*texture);
 
+        if (layerTileSize == 32)
+            sprite.setScale(m_scale);
+
         int layerWidth = m_width;
     	int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
+
+        float scaledTileSize = layerTileSize * (layerTileSize == 32 ? m_scale.x : 1.0f);
 
         int startRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y - viewSize.y / 2) / layerTileSize));
         int endRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y + viewSize.y / 2) / layerTileSize) + 1);
@@ -124,10 +129,18 @@ void TilesMap::render(sf::RenderWindow& w)
                         layerTileSize
                     ));
 
-                    float posX = static_cast<float>(col * layerTileSize);
-                    float posY = static_cast<float>(row * layerTileSize);
-                    sprite.setPosition(posX, posY);
-
+                    if (layerTileSize == 32) 
+                    {
+                        float posX = static_cast<float>(col * layerTileSize * m_scale.x);
+                        float posY = static_cast<float>(row * layerTileSize * m_scale.y);
+                        sprite.setPosition(posX, posY);
+                    }
+                    else 
+                    {
+                        float posX = static_cast<float>(col * layerTileSize);
+                        float posY = static_cast<float>(row * layerTileSize);
+                        sprite.setPosition(posX, posY);
+                    }
                     w.draw(sprite);
                 }
                 catch (const std::exception& e) 
@@ -175,6 +188,12 @@ sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
         return it32->second;
 
     throw std::runtime_error("Tile type not found: " + std::string(1, tile));
+}
+
+void TilesMap::setScale(float scaleX, float scaleY)
+{
+    m_scale.x = scaleX;
+    m_scale.y = scaleY;
 }
 
 int TilesMap::clamp(int min, int max, int val)

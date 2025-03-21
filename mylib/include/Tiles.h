@@ -32,7 +32,8 @@ public:
 
     void setTile(int layerIndex, int row, int col, TileType tileType);
 
-    // Redéfinir la méthode render de GameObject
+    void setScale(float scaleX, float scaleY);
+
     void render(sf::RenderWindow& w) override;
 
     sf::Vector2i getTileCoordinateInTexture(const TileType& tile);
@@ -50,6 +51,7 @@ private:
     int m_width;
     int m_height;
     int m_tileSize;
+    sf::Vector2f m_scale = { 1.0f, 1.0f };
     std::vector<TileType> m_tiles;
     std::vector<Layer> m_layers;
 };
