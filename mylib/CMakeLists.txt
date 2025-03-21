@@ -28,6 +28,8 @@ set(SOURCES
     ${SOURCE_DIR}/StateManager.cpp
     ${SOURCE_DIR}/TextureManager.cpp
     ${SOURCE_DIR}/UI.cpp
+    ${SOURCE_DIR}/Tiles.cpp
+    ${SOURCE_DIR}/Map.cpp
 )
 
 set(HEADERS
@@ -55,6 +57,8 @@ set(HEADERS
     ${HEADER_DIR}/StateManager.h
     ${HEADER_DIR}/TextureManager.h
     ${HEADER_DIR}/UI.h
+    ${HEADER_DIR}/Tiles.h
+    ${HEADER_DIR}/Map.h
 )
 
 add_library(${PROJECT_NAME}
