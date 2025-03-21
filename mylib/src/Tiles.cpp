@@ -160,8 +160,8 @@ sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
 {
     static std::map<TileType, sf::Vector2i> tileMap16 = {
          {'H', {4, 6}}
-        ,{'C', {9, 2}}
-        ,{'R', {9, 4}}
+        //,{'C', {9, 2}}
+        //,{'R', {9, 4}}
     };
 
     static std::map<TileType, sf::Vector2i> tileMap32 = {

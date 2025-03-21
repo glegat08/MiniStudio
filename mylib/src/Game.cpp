@@ -114,15 +114,15 @@ void Game::render()
 {
 	Camera::getInstance().apply();
 
-	/*if (m_map)
-	{
-		m_map->render(*m_renderWindow);
-	}
+	//if (m_map)
+	//{
+	//	m_map->render(*m_renderWindow);
+	//}
 
-	if (m_mapLayers)
-	{
-		m_mapLayers->render(*m_renderWindow);
-	}*/
+	//if (m_mapLayers)
+	//{
+	//	m_mapLayers->render(*m_renderWindow);
+	//}
 
 	for (auto& gameObject : m_gameObjects)
 	{
