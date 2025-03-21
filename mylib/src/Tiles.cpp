@@ -73,6 +73,8 @@ void TilesMap::render(sf::RenderWindow& w)
             continue;
 
         int layerTileSize = m_layers[layerIndex].tileSize;
+        float scaleFactor = (layerTileSize == 32) ? m_scale.x : 1.0f;
+        float scaledTileSize = layerTileSize * scaleFactor;
 
         sf::Texture* texture = nullptr;
         if (layerTileSize == 16)
@@ -97,14 +99,17 @@ void TilesMap::render(sf::RenderWindow& w)
             sprite.setScale(m_scale);
 
         int layerWidth = m_width;
-    	int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
+        int layerHeight = static_cast<int>(m_layers[layerIndex].tiles.size() / layerWidth);
 
-        float scaledTileSize = layerTileSize * (layerTileSize == 32 ? m_scale.x : 1.0f);
+        int startRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y - viewSize.y / 2) / scaledTileSize));
+        int endRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y + viewSize.y / 2) / scaledTileSize) + 1);
+        int startCol = clamp(0, layerWidth - 1, static_cast<int>((viewCenter.x - viewSize.x / 2) / scaledTileSize));
+        int endCol = clamp(0, layerWidth - 1, static_cast<int>((viewCenter.x + viewSize.x / 2) / scaledTileSize) + 1);
 
-        int startRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y - viewSize.y / 2) / layerTileSize));
-        int endRow = clamp(0, layerHeight - 1, static_cast<int>((viewCenter.y + viewSize.y / 2) / layerTileSize) + 1);
-        int startCol = clamp(0, layerWidth - 1, static_cast<int>((viewCenter.x - viewSize.x / 2) / layerTileSize));
-        int endCol = clamp(0, layerWidth - 1, static_cast<int>((viewCenter.x + viewSize.x / 2) / layerTileSize) + 1);
+        startRow = std::max(0, startRow - 1);
+        endRow = std::min(layerHeight - 1, endRow + 1);
+        startCol = std::max(0, startCol - 1);
+        endCol = std::min(layerWidth - 1, endCol + 1);
 
         for (int row = startRow; row <= endRow; ++row)
         {
@@ -129,13 +134,13 @@ void TilesMap::render(sf::RenderWindow& w)
                         layerTileSize
                     ));
 
-                    if (layerTileSize == 32) 
+                    if (layerTileSize == 32)
                     {
                         float posX = static_cast<float>(col * layerTileSize * m_scale.x);
                         float posY = static_cast<float>(row * layerTileSize * m_scale.y);
                         sprite.setPosition(posX, posY);
                     }
-                    else 
+                    else
                     {
                         float posX = static_cast<float>(col * layerTileSize);
                         float posY = static_cast<float>(row * layerTileSize);
@@ -143,7 +148,7 @@ void TilesMap::render(sf::RenderWindow& w)
                     }
                     w.draw(sprite);
                 }
-                catch (const std::exception& e) 
+                catch (const std::exception& e)
                 {
                     std::cerr << "Error rendering tile at layer " << layerIndex << " (" << row << "," << col << "): " << e.what() << std::endl;
                 }
@@ -151,7 +156,6 @@ void TilesMap::render(sf::RenderWindow& w)
         }
     }
 }
-
 sf::Vector2i TilesMap::getTileCoordinateInTexture(const TileType& tile)
 {
     static std::map<TileType, sf::Vector2i> tileMap16 = {
