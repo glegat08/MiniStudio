@@ -9,6 +9,7 @@ set(SOURCES
     ${SOURCE_DIR}/Collision.cpp
     ${SOURCE_DIR}/Component.cpp
     ${SOURCE_DIR}/Composite.cpp
+    ${SOURCE_DIR}/Decoration.cpp
     ${SOURCE_DIR}/Enemy.cpp
     ${SOURCE_DIR}/EnemyState.cpp
     ${SOURCE_DIR}/Engine.cpp
@@ -34,6 +35,7 @@ set(HEADERS
     ${HEADER_DIR}/Collision.h
     ${HEADER_DIR}/Component.h
     ${HEADER_DIR}/Composite.h
+    ${HEADER_DIR}/Decoration.h
     ${HEADER_DIR}/Enemy.h
     ${HEADER_DIR}/EnemyState.h
     ${HEADER_DIR}/Engine.h

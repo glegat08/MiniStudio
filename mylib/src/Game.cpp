@@ -70,6 +70,42 @@ void Game::setLayer()
 	m_gameObjects.push_back(m_mapLayers);
 }
 
+void Game::addDecoration(const std::string& name, const std::string& texturePath, const sf::Vector2f& position, float scale, int zOrder)
+{
+	auto decoration = std::make_shared<Decoration>(name, texturePath, position);
+	decoration->setScale(scale, scale);
+	decoration->setZOrder(zOrder);
+	m_decorations.push_back(decoration);
+
+	std::sort(m_decorations.begin(), m_decorations.end(),
+		[](const std::shared_ptr<Decoration>& a, const std::shared_ptr<Decoration>& b) 
+		{
+			return a->getZOrder() < b->getZOrder();
+		});
+}
+
+void Game::removeDecoration(const std::string& name)
+{
+	auto it = std::find_if(m_decorations.begin(), m_decorations.end(),
+		[&name](const std::shared_ptr<Decoration>& decoration) 
+		{
+			return decoration->getName() == name;
+		});
+
+	if (it != m_decorations.end())
+		m_decorations.erase(it);
+}
+
+Decoration* Game::getDecoration(const std::string& name)
+{
+	for (auto& decoration : m_decorations)
+	{
+		if (decoration->getName() == name)
+			return decoration.get();
+	}
+	return nullptr;
+}
+
 void Game::initialize()
 {
 	Camera::getInstance().initialize(m_renderWindow);
@@ -82,6 +118,10 @@ void Game::initialize()
 	setLayer();
 	setPlayer();
 	setEnemy();
+
+	addDecoration("baobab1", "Sets/baobab.png", sf::Vector2f(100.f, 200.f), 1.f, 1);
+	addDecoration("bush1", "Sets/bush.png", sf::Vector2f(300.f, 150.f), 0.5f, 1);
+	addDecoration("kayou2", "Sets/kayou.png", sf::Vector2f(500.f, 400.f), 0.3f, 2);
 }
 
 void Game::processInput(const sf::Event& event)
@@ -127,6 +167,11 @@ void Game::render()
 	for (auto& gameObject : m_gameObjects)
 	{
 		gameObject->render(*m_renderWindow);
+	}
+
+	for (auto& decoration : m_decorations)
+	{
+		decoration->render(*m_renderWindow);
 	}
 
 	SceneBase::render();
