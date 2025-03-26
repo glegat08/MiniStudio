@@ -10,7 +10,7 @@ To start the project, please follow those steps :
 
 -> Use your IDE's terminal and write ".\Bootstrap.bat"
 
--> Close your IDE then go to your folder, into the build folder then launch the .sln
+-> Then click on File -> Open -> Solution and go to your folder, into the build folder then launch the .sln
 
 -> Set "mainFile" as startup project
 
