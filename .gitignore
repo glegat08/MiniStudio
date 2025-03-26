@@ -2,5 +2,5 @@
 build
 out
 .gitattributes
-mylib\\CMakeFiles
-mylib\\CMakeCache.txt
+mylib\CMakeFiles
+mylib\CMakeCache.txt
