@@ -311,6 +311,10 @@ void AttackState::enterState()
         disableMovement();
     }
 
+    auto sound_component = static_cast<SoundComponent*>(m_owner->getComponent("SoundComponent"));
+    if (sound_component)
+        sound_component->playAction("attack", 20.f);
+
     playStateAnimation();
     m_owner->setState(stateName::attack);
     m_animClock.restart();

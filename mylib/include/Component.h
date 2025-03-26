@@ -2,6 +2,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <string>
+#include <unordered_map>
 
 class CompositeGameObject;
 class CameraTargetAdapter;
@@ -78,4 +79,28 @@ private:
 	bool m_isMovingDown;
 	bool m_isMovingLeft;
 	bool m_isMovingRight;
+};
+
+
+class SoundComponent : public Component
+{
+public:
+	SoundComponent(const std::string& name = "SoundComponent");
+	~SoundComponent() override = default;
+
+	void initialize() override;
+
+	void playSound(const std::string& soundName, float volume = 100.0f, float pitch = 1.0f);
+	void stopSound(const std::string& soundName);
+	void stopAllSounds();
+
+	void addSoundMapping(const std::string& actionName, const std::string& soundName);
+	void removeSoundMapping(const std::string& actionName);
+	bool hasMapping(const std::string& actionName) const;
+
+	void playAction(const std::string& actionName, float volume = 100.0f, float pitch = 1.0f);
+	void stopAction(const std::string& actionName);
+
+private:
+	std::unordered_map<std::string, std::string> m_soundMappings;
 };

@@ -14,9 +14,6 @@ public:
         return instance;
     }
 
-    TextureManager(const TextureManager&) = delete;
-    TextureManager& operator=(const TextureManager&) = delete;
-
     void initialize();
     void cleanup();
 
@@ -24,15 +21,7 @@ public:
 
     sf::Texture* getTexture(const std::string& name);
 
-    void removeTexture(const std::string& name);
-
     bool hasTexture(const std::string& name) const;
-
-    sf::Vector2u getTextureDimensions(const std::string& name) const;
-
-    bool loadTexturesFromDirectory(const std::string& directory, const std::string& pattern = "*");
-
-    std::vector<std::string> getLoadedTextureNames() const;
 
     void loadAllGameTextures();
 

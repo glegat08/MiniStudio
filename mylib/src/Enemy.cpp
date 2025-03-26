@@ -4,6 +4,7 @@
 #include <random>
 
 #include "Animation.h"
+#include "AudioManager.h"
 #include "Collision.h"
 #include "Game.h"
 #include "Hero.h"
@@ -208,6 +209,8 @@ void RangedEnemy::Attack(float deltaTime)
     if (isWithinAttackRange() && isAtOptimalDistance())
     {
         std::cout << getName() << " shooting the player!" << std::endl;
+
+		SoundManager::getInstance().playSound("arrow_shoot", 60.f);
 
         auto enemy_render = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
         if (enemy_render)

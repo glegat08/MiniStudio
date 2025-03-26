@@ -2,8 +2,10 @@
 #include "TextureManager.h"
 #include "Component.h"
 #include "Animation.h"
+#include "AudioManager.h"
 #include "Collision.h"
 #include "Effect.h"
+#include "Map.h"
 
 Hero::Hero(const std::string& name)
     : CompositeGameObject(name)
@@ -37,8 +39,11 @@ void Hero::initialize(const sf::Vector2f& position, const float& size, const sf:
     hitbox->setDebugDraw(false);
     addComponent(hitbox);
 
-    m_speed = speed;
+    auto sound_component = std::make_shared<SoundComponent>();
+    sound_component->addSoundMapping("attack", "hero_attack");
+    addComponent(sound_component);
 
+    m_speed = speed;
     m_stateManager.initialize();
 }
 
@@ -56,6 +61,10 @@ void Hero::update(const float& deltaTime)
             float slowdown_factor = std::min(1.0f, 4.0f * deltaTime);
             m_knockBack *= (1.0f - slowdown_factor);
 
+			sf::Vector2f newPos = currentPos + m_knockBack * deltaTime;
+
+            float playerRadius = 25.f;
+			newPos = WorldLimits::limits(newPos, playerRadius);
             square_renderer->setPosition(currentPos + m_knockBack * deltaTime);
         }
     }
@@ -96,8 +105,10 @@ void Hero::takeDamage(int amount, const sf::Vector2f& attackerPos)
 
     m_health -= actualDamage;
 
-auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
-    if (square_renderer)
+	SoundManager::getInstance().playSound("hit", 80.f);
+
+	auto square_renderer = static_cast<SquareRenderer*>(getComponent("SquareRenderer"));
+	if (square_renderer)
     {
         sf::Vector2f position = square_renderer->getPosition();
         sf::Vector2f entryDirection = position - attackerPos;

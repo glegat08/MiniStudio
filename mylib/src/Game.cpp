@@ -3,17 +3,19 @@
 #include <iostream>
 #include <random>
 
+#include "AudioManager.h"
 #include "Camera.h"
 #include "Collision.h"
 #include "Effect.h"
 #include "Enemy.h"
+#include "Map.h"
 #include "TextureManager.h"
 #include "UI.h"
 
 Game* Game::m_gameInstance = nullptr;
 
 Game::Game(sf::RenderWindow* window, const float& framerate)
-	: SceneBase(window, framerate)
+	: SceneBase(window, framerate, "Game")
 	, m_deadPlayer(false)
 {
 	m_gameInstance = this;
@@ -25,15 +27,25 @@ void Game::initialize()
 	TextureManager::getInstance().initialize();
 	TextureManager::getInstance().loadAllGameTextures();
 
+	SoundManager::getInstance().initialize();
+	SoundManager::getInstance().loadAllGameSounds();
+	SoundManager::getInstance().setMusicLoop(true);
+
+	sf::FloatRect worldLimits(0, 0, 3000, 2500);
+
 	Camera::getInstance().initialize(m_renderWindow);
-	Camera::getInstance().setZoom(1.5f);
+	Camera::getInstance().setZoom(1.7f);
+	Camera::getInstance().setWorldBounds(worldLimits);
 	Camera::getInstance().setInterpolationSpeed(4.0f);
+
+	WorldLimits::initialize(worldLimits);
 
 	setMap();
 	setLayer();
 	setPlayer();
 	setupHealthUI();
 	setEnemy();
+	setupScoreUI();
 }
 
 void Game::setPlayer()
@@ -48,7 +60,7 @@ void Game::setPlayer()
 
 void Game::setEnemy()
 {
-	enemyGenerator(10);
+	enemyGenerator(20);
 }
 
 std::shared_ptr<Hero> Game::createPlayer()
@@ -112,7 +124,7 @@ void Game::setLayer()
 {
 	m_mapLayers = std::make_shared<TilesMap>("PathLayer", path, 32);
 
-	m_mapLayers->setScale(4.0f, 4.0f);
+	m_mapLayers->setScale(2.0f, 2.0f);
 
 	std::cout << "Pathlayer has been added with size: " << m_mapLayers->getWidth()
 		<< "x" << m_mapLayers->getHeight() << std::endl;
@@ -126,9 +138,26 @@ void Game::handlePlayerAttackingEnemy(Hero* hero, IEnemy* enemy)
 	if (!player_render)
 		return;
 
+	bool wasAlreadyDead = enemy->isDead();
+
 	sf::Vector2f playerPos = player_render->getPosition();
-	enemy->takeDamage(25, playerPos);
+	enemy->takeDamage(100, playerPos);
 	enemy->knockBack(playerPos, 600.0f);
+
+	if (!wasAlreadyDead && enemy->isDead())
+	{
+		auto meleeEnemy = dynamic_cast<MeleeEnemy*>(enemy);
+		if (meleeEnemy)
+			addScore(100);
+		else
+		{
+			auto rangedEnemy = dynamic_cast<RangedEnemy*>(enemy);
+			if (rangedEnemy)
+				addScore(150);
+			else
+				addScore(50);
+		}
+	}
 }
 
 void Game::handleEnemyAttackingPlayer(Hero* hero, IEnemy* enemy)
@@ -152,6 +181,14 @@ void Game::processInput(const sf::Event& event)
 void Game::update(const float& deltaTime)
 {
 	SceneBase::update(deltaTime);
+
+	m_enemySpawnTimer += deltaTime;
+
+	if (m_enemySpawnTimer >= m_enemySpawnInterval && getCurrentEnemyCount() < m_maxEnemyCount)
+	{
+		spawnEnemyWave(m_enemiesPerWave);
+		m_enemySpawnTimer = 0.0f;
+	}
 
 	for (auto& gameObject : m_gameObjects)
 	{
@@ -177,6 +214,7 @@ void Game::update(const float& deltaTime)
 
 	cleanupProjectiles();
 	cleanupEffects();
+	cleanupDeadEnemies();
 	Hitbox::resolveCollisions(m_gameObjects);
 
 	Camera::getInstance().update(deltaTime);
@@ -186,53 +224,61 @@ void Game::render()
 {
 	Camera::getInstance().apply();
 
-	std::vector<std::shared_ptr<CompositeGameObject>> sortedObjects = m_gameObjects;
+	if (m_map)
+		m_map->render(*m_renderWindow);
+	if (m_mapLayers)
+		m_mapLayers->render(*m_renderWindow);
 
-	std::sort(sortedObjects.begin(), sortedObjects.end(),
-		[](const std::shared_ptr<CompositeGameObject>& a, const std::shared_ptr<CompositeGameObject>& b)
-		{
-			if (a->getCategory() == "UI")
-				return false; // UI always rendered last
-			if (b->getCategory() == "UI")
-				return true;
-
-			auto first_render = static_cast<SquareRenderer*>(a->getComponent("SquareRenderer"));
-			auto second_render = static_cast<SquareRenderer*>(b->getComponent("SquareRenderer"));
-
-			if (!first_render || !second_render)
-				return false;
-
-			float posYA = first_render->getPosition().y;
-			float posYB = second_render->getPosition().y;
-
-			auto enemyA = dynamic_cast<IEnemy*>(a.get());
-			auto enemyB = dynamic_cast<IEnemy*>(b.get());
-
-			if (enemyA && enemyA->isDead() && (!enemyB || !enemyB->isDead()))
-				return true;
-
-			if (enemyB && enemyB->isDead() && (!enemyA || !enemyA->isDead()))
-				return false;
-
-			return posYA < posYB;
-		});
-
-	// First render all non-UI game objects with the game camera
-	for (auto& gameObject : sortedObjects)
+	std::vector<std::shared_ptr<CompositeGameObject>> gameObjects;
+	for (auto& game_object : m_gameObjects) 
 	{
-		if (gameObject->getCategory() != "UI")
-			gameObject->render(*m_renderWindow);
+		if (!dynamic_cast<TilesMap*>(game_object.get()) && game_object->getCategory() != "UI") 
+			gameObjects.push_back(game_object);
 	}
 
-	// Set back to default view for UI elements
+	std::sort(gameObjects.begin(), gameObjects.end(),
+		[](const std::shared_ptr<CompositeGameObject>& first, const std::shared_ptr<CompositeGameObject>& second)
+		{
+			auto first_enemy = dynamic_cast<IEnemy*>(first.get());
+			auto second_enemy = dynamic_cast<IEnemy*>(second.get());
+
+			if (first_enemy && first_enemy->isDead() && (!second_enemy || !second_enemy->isDead()))
+				return true;
+
+			if (second_enemy && second_enemy->isDead() && (!first_enemy || !first_enemy->isDead()))
+				return false;
+
+			auto first_square_render = static_cast<SquareRenderer*>(first->getComponent("SquareRenderer"));
+			auto second_square_render = static_cast<SquareRenderer*>(second->getComponent("SquareRenderer"));
+
+			if (first_square_render && second_square_render) 
+			{
+				float first_positionY = first_square_render->getPosition().y;
+				float second_positionY = second_square_render->getPosition().y;
+				return first_positionY < second_positionY;
+			}
+
+			return false;
+		});
+
+	for (auto& game_object : gameObjects) 
+	{
+		game_object->render(*m_renderWindow);
+	}
+
 	sf::View defaultView = m_renderWindow->getDefaultView();
 	m_renderWindow->setView(defaultView);
 
-	// Then render all UI elements with the default camera
-	for (auto& gameObject : sortedObjects)
+	for (auto& game_object : m_gameObjects) 
 	{
-		if (gameObject->getCategory() == "UI")
-			gameObject->render(*m_renderWindow);
+		if (game_object->getCategory() == "UI") 
+			game_object->render(*m_renderWindow);
+	}
+
+	if (!m_player->isAlive()) 
+	{
+		m_isGameOver = true;
+		displayGameOver();
 	}
 
 	SceneBase::render();
@@ -245,67 +291,16 @@ Game* Game::getInstance()
 
 std::shared_ptr<Arrow> Game::createArrow(const sf::Vector2f& pos, const sf::Vector2f& direction, int damage)
 {
-	auto arrow = std::make_shared<Arrow>("Arrow", damage);
+	auto arrow = std::make_shared<Arrow>("Arrow", 1);
 	arrow->initialize(pos, direction, 400.f);
 
 	m_gameObjects.push_back(arrow);
 	return arrow;
 }
 
-void Game::enemyGenerator(int count)
+void Game::enemyGenerator(int initialCount)
 {
-	sf::Vector2u windowSize = m_renderWindow->getSize();
-
-	std::random_device random_device;
-	std::mt19937 gen(random_device());
-
-	std::uniform_int_distribution<> randomEnemy(0, 1); // 0 for melee, 1 for ranged
-	std::uniform_real_distribution<float> positionX(windowSize.x * 0.2f, windowSize.x * 1.5f);
-	std::uniform_real_distribution<float> positionY(windowSize.y * 0.2f, windowSize.y * 1.5f);
-
-	for (int i = 0; i < count; i++)
-	{
-		sf::Vector2f randomPos(positionX(gen), positionY(gen));
-
-		auto player_renderer = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
-		if (player_renderer)
-		{
-			sf::Vector2f playerPos = player_renderer->getPosition();
-			sf::Vector2f direction = randomPos - playerPos;
-			float distance = std::sqrt(direction.x * direction.x + direction.y * direction.y);
-
-			if (distance < 150.0f)
-			{
-				if (distance > 0.1f)
-				{
-					direction /= distance;
-					randomPos = playerPos + direction * 150.0f;
-				}
-				else
-				{
-					randomPos = playerPos + sf::Vector2f(10.0f, 100.0f);
-				}
-			}
-		}
-
-		int enemyType = randomEnemy(gen);
-		std::shared_ptr<IEnemy> enemy;
-
-		if (enemyType == 0)
-		{
-			auto meleeEnemy = std::make_shared<MeleeEnemy>("MeleeEnemy" + std::to_string(i + 1));
-			meleeEnemy->init(randomPos);
-			enemy = meleeEnemy;
-		}
-		else
-		{
-			auto rangedEnemy = std::make_shared<RangedEnemy>("RangedEnemy" + std::to_string(i + 1));
-			rangedEnemy->init(randomPos);
-			enemy = rangedEnemy;
-		}
-
-		m_gameObjects.push_back(enemy);
-	}
+	spawnEnemyWave(initialCount);
 }
 
 void Game::cleanupProjectiles()
@@ -357,4 +352,148 @@ void Game::setupHealthUI()
 	m_healthUI->setPosition(sf::Vector2f(100.f, 100.f));
 
 	m_gameObjects.push_back(m_healthUI);
+}
+
+void Game::displayGameOver()
+{
+	sf::RectangleShape overlay(sf::Vector2f(m_renderWindow->getSize()));
+	overlay.setFillColor(sf::Color(0, 0, 0, 128));
+
+	sf::Font gameOverFont;
+	gameOverFont.loadFromFile("C:\\Users\\guill\\source\\repos\\MiniStudio\\resources\\font.ttf");
+
+	m_gameOverText.setFont(gameOverFont);
+	m_gameOverText.setString("GAME OVER");
+	m_gameOverText.setCharacterSize(80);
+	m_gameOverText.setFillColor(sf::Color::Red);
+
+	sf::FloatRect textBounds = m_gameOverText.getLocalBounds();
+	m_gameOverText.setPosition
+	(
+		(m_renderWindow->getSize().x - textBounds.width) / 2,
+		(m_renderWindow->getSize().y - textBounds.height) / 2
+	);
+
+	m_renderWindow->draw(overlay);
+	m_renderWindow->draw(m_gameOverText);
+}
+
+int Game::getCurrentEnemyCount() const
+{
+	int count = 0;
+	for (const auto& game_object : m_gameObjects)
+	{
+		if (game_object && game_object->getCategory() == "Enemy" && !dynamic_cast<IEnemy*>(game_object.get())->isDead())
+			count++;
+	}
+	return count;
+}
+
+void Game::spawnEnemyWave(int count)
+{
+	static int enemyIndex = 0;
+
+	for (int idx = 0; idx < count; idx++)
+	{
+		sf::Vector2f spawnPos = getRandomSpawnPosition();
+		std::shared_ptr<IEnemy> enemy = createRandomEnemy(spawnPos, ++enemyIndex);
+
+		m_gameObjects.push_back(enemy);
+	}
+}
+
+sf::Vector2f Game::getRandomSpawnPosition()
+{
+	static std::random_device random_device;
+	static std::mt19937 gen(random_device());
+
+	sf::Vector2f playerPos;
+	auto player_renderer = static_cast<SquareRenderer*>(m_player->getComponent("SquareRenderer"));
+	if (player_renderer)
+		playerPos = player_renderer->getPosition();
+
+	std::uniform_real_distribution<float> angleDist(0.0f, 2.0f * 3.14159f);
+	float angle = angleDist(gen);
+
+	std::uniform_real_distribution<float> distanceDist(m_minSpawnDistance, m_maxSpawnDistance);
+	float distance = distanceDist(gen);
+
+	sf::Vector2f spawnPos
+	(
+		playerPos.x + std::cos(angle) * distance,
+		playerPos.y + std::sin(angle) * distance
+	);
+
+	sf::FloatRect worldBounds(0, 0, 3000, 2500);
+	spawnPos.x = std::max(worldBounds.left, std::min(spawnPos.x, worldBounds.left + worldBounds.width));
+	spawnPos.y = std::max(worldBounds.top, std::min(spawnPos.y, worldBounds.top + worldBounds.height));
+
+	return spawnPos;
+}
+
+std::shared_ptr<IEnemy> Game::createRandomEnemy(const sf::Vector2f& position, int index)
+{
+	static std::random_device random_device;
+	static std::mt19937 gen(random_device());
+	std::uniform_int_distribution<> randomEnemy(0, 1); // 0 for melee, 1 for ranged
+
+	int enemyType = randomEnemy(gen);
+	std::shared_ptr<IEnemy> enemy;
+
+	if (enemyType == 0)
+	{
+		auto meleeEnemy = std::make_shared<MeleeEnemy>("MeleeEnemy" + std::to_string(index));
+		meleeEnemy->init(position);
+		enemy = meleeEnemy;
+	}
+	else
+	{
+		auto rangedEnemy = std::make_shared<RangedEnemy>("RangedEnemy" + std::to_string(index));
+		rangedEnemy->init(position);
+		enemy = rangedEnemy;
+	}
+
+	return enemy;
+}
+
+void Game::cleanupDeadEnemies()
+{
+	sf::FloatRect visibleArea = Camera::getInstance().getVisibleArea();
+	visibleArea.left -= 200.0f;
+	visibleArea.top -= 200.0f;
+	visibleArea.width += 400.0f;
+	visibleArea.height += 400.0f;
+
+	auto iterator = m_gameObjects.begin();
+	while (iterator != m_gameObjects.end())
+	{
+		auto enemy = dynamic_cast<IEnemy*>(iterator->get());
+		if (enemy && enemy->isDead())
+		{
+			auto renderer = static_cast<SquareRenderer*>((*iterator)->getComponent("SquareRenderer"));
+			if (renderer)
+			{
+				sf::Vector2f pos = renderer->getPosition();
+				if (!visibleArea.contains(pos))
+				{
+					iterator = m_gameObjects.erase(iterator);
+					continue;
+				}
+			}
+		}
+		++iterator;
+	}
+}
+
+void Game::addScore(int points)
+{
+	m_score += points;
+}
+
+void Game::setupScoreUI()
+{
+	m_scoreUI = std::make_shared<ScoreUI>("PlayerScoreUI");
+	m_scoreUI->initialize(this, 0.25f);
+	m_scoreUI->setPosition(sf::Vector2f(910.f, 50.f));
+	m_gameObjects.push_back(m_scoreUI);
 }

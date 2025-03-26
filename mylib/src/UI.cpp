@@ -1,6 +1,10 @@
 #include "UI.h"
 
+#include <iostream>
+
+#include "PathManager.h"
 #include "TextureManager.h"
+#include "Game.h"
 
 HealthUI::HealthUI(const std::string& name)
     : CompositeGameObject(name)
@@ -31,7 +35,7 @@ void HealthUI::initialize(Hero* hero, float scale)
 
     loadTextures();
 
-    m_healthBarSize.x = m_healthBarSize.x * 0.35f;
+    m_healthBarSize.x = m_healthBarSize.x * 0.30f;
     m_healthBarSize.y = m_healthBarSize.y * 0.12f;
 
     m_healthBarFill.setSize(sf::Vector2f(m_healthBarSize.x, m_healthBarSize.y));
@@ -161,8 +165,8 @@ void HealthUI::setPosition(const sf::Vector2f& position)
     float healthBarX = m_position.x + (m_healthBarOffset.x * m_scale) + (m_heroIcon.getGlobalBounds().width * 0.4f);
     float healthBarY = m_position.y + (m_healthBarBackground.getGlobalBounds().height / 2.0f) - (scaledHeight / 2.0f);
 
-    m_healthBarFill.setPosition(healthBarX + 10, healthBarY + 15);
-    m_healthBarDamage.setPosition(healthBarX + 10, healthBarY + 15);
+    m_healthBarFill.setPosition(healthBarX + 35, healthBarY + 15);
+    m_healthBarDamage.setPosition(healthBarX + 35, healthBarY + 15);
 
     m_healthBarFill.setSize(sf::Vector2f(scaledWidth, scaledHeight));
     m_healthBarDamage.setSize(sf::Vector2f(scaledWidth, scaledHeight));
@@ -255,4 +259,89 @@ void HealthUI::changeHeroIcon(HeroIconState state)
     }
 
     m_heroIcon.setScale(currentScale);
+}
+
+
+
+ScoreUI::ScoreUI(const std::string& name)
+    : CompositeGameObject(name)
+    , m_game(nullptr)
+    , m_position(10.f, 50.f)
+    , m_scale(0.5f)
+    , m_lastScore(0)
+{
+    setCategory("UI");
+}
+
+void ScoreUI::initialize(Game* game, float scale)
+{
+    if (!game)
+        return;
+
+    m_game = game;
+    m_scale = scale;
+    m_lastScore = m_game->getScore();
+
+    loadFont();
+
+    m_scoreText.setFont(m_font);
+    m_scoreText.setCharacterSize(24);
+    m_scoreText.setFillColor(sf::Color::White);
+    m_scoreText.setOutlineColor(sf::Color::Black);
+    m_scoreText.setOutlineThickness(1.f);
+    m_scoreText.setString("Score : 0");
+
+    setPosition(m_position);
+}
+
+void ScoreUI::loadFont()
+{
+    try 
+    {
+        std::string fontPath = PathManager::getResourcePath("font.ttf");
+        if (!m_font.loadFromFile(fontPath)) 
+            std::cerr << "Failed to load font from: " << fontPath << std::endl;
+    }
+    catch (const std::exception& e) 
+    {
+        std::cerr << "Error loading font: " << e.what() << std::endl;
+    }
+}
+
+void ScoreUI::update(const float& deltaTime)
+{
+    if (!m_game)
+        return;
+
+    int currentScore = m_game->getScore();
+
+    if (currentScore != m_lastScore)
+    {
+        m_lastScore = currentScore;
+        updateScoreText();
+    }
+
+    CompositeGameObject::update(deltaTime);
+}
+
+void ScoreUI::render(sf::RenderWindow& window)
+{
+    window.draw(m_scoreText);
+    CompositeGameObject::render(window);
+}
+
+void ScoreUI::setPosition(const sf::Vector2f& position)
+{
+    m_position = position;
+    m_scoreText.setPosition(m_position);
+}
+
+sf::Vector2f ScoreUI::getPosition() const
+{
+    return m_position;
+}
+
+void ScoreUI::updateScoreText()
+{
+    m_scoreText.setString("Score: " + std::to_string(m_lastScore));
 }

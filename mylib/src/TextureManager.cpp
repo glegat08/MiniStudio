@@ -64,81 +64,9 @@ sf::Texture* TextureManager::getTexture(const std::string& name)
     return nullptr;
 }
 
-void TextureManager::removeTexture(const std::string& name)
-{
-    auto iterator = m_textures.find(name);
-    if (iterator != m_textures.end())
-    {
-        m_textures.erase(iterator);
-        std::cout << "Removed texture: " << name << std::endl;
-    }
-}
-
 bool TextureManager::hasTexture(const std::string& name) const
 {
     return m_textures.find(name) != m_textures.end();
-}
-
-sf::Vector2u TextureManager::getTextureDimensions(const std::string& name) const
-{
-    auto iterator = m_textures.find(name);
-    if (iterator != m_textures.end())
-    {
-        return iterator->second->getSize();
-    }
-
-    return sf::Vector2u(0, 0);
-}
-
-bool TextureManager::loadTexturesFromDirectory(const std::string& directory, const std::string& pattern)
-{
-    std::string fullDirectoryPath = PathManager::getResourcePath(directory);
-    bool loadedAny = false;
-
-    try
-    {
-        for (const auto& entry : std::filesystem::directory_iterator(fullDirectoryPath))
-        {
-            if (entry.is_regular_file())
-            {
-                std::string filename = entry.path().filename().string();
-                std::string extension = entry.path().extension().string();
-
-                if ((pattern == "*" || filename.find(pattern) != std::string::npos) &&
-                    (extension == ".png" || extension == ".jpg" || extension == ".jpeg" ||
-                        extension == ".bmp" || extension == ".tga"))
-                {
-                    std::string name = entry.path().stem().string();
-                    std::string relativePath = directory + "/" + filename;
-
-                    if (loadTexture(name, relativePath))
-                    {
-                        loadedAny = true;
-                    }
-                }
-            }
-        }
-    }
-    catch (const std::exception& e)
-    {
-        std::cerr << "Error loading textures from directory: " << e.what() << std::endl;
-        return false;
-    }
-
-    return loadedAny;
-}
-
-std::vector<std::string> TextureManager::getLoadedTextureNames() const
-{
-    std::vector<std::string> names;
-    names.reserve(m_textures.size());
-
-    for (const auto& pair : m_textures)
-    {
-        names.push_back(pair.first);
-    }
-
-    return names;
 }
 
 void TextureManager::loadAllGameTextures()

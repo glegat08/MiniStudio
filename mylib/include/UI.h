@@ -4,6 +4,8 @@
 #include "Hero.h"
 #include <SFML/Graphics.hpp>
 
+class Game;
+
 enum class HeroIconState
 {
     Neutral,
@@ -23,9 +25,6 @@ public:
 
     void setPosition(const sf::Vector2f& position);
     sf::Vector2f getPosition() const;
-
-    void setScale(float scale);
-    float getScale() const;
 
     void updateIconState();
 
@@ -60,4 +59,31 @@ private:
     float m_damagePercentage;
 
     int m_lastHealth;
+};
+
+
+class ScoreUI : public CompositeGameObject
+{
+public:
+    ScoreUI(const std::string& name = "ScoreUI");
+    ~ScoreUI() = default;
+
+    void initialize(Game* game, float scale = 0.5f);
+    void update(const float& deltaTime) override;
+    void render(sf::RenderWindow& window) override;
+
+    void setPosition(const sf::Vector2f& position);
+    sf::Vector2f getPosition() const;
+
+private:
+    void loadFont();
+    void updateScoreText();
+
+private:
+    Game* m_game;
+    sf::Text m_scoreText;
+    sf::Font m_font;
+    sf::Vector2f m_position;
+    float m_scale;
+    int m_lastScore;
 };

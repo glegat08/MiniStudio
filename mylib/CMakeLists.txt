@@ -6,6 +6,7 @@ set(HEADER_DIR ${CMAKE_CURRENT_SOURCE_DIR}/include)
 set(SOURCES
     ${SOURCE_DIR}/Animation.cpp
     ${SOURCE_DIR}/Arrow.cpp
+    ${SOURCE_DIR}/AudioManager.cpp
     ${SOURCE_DIR}/Bullet.cpp
     ${SOURCE_DIR}/Camera.cpp
     ${SOURCE_DIR}/Collision.cpp
@@ -23,6 +24,7 @@ set(SOURCES
     ${SOURCE_DIR}/IGameObject.cpp
     ${SOURCE_DIR}/Projectile.cpp
     ${SOURCE_DIR}/Map.cpp
+    ${SOURCE_DIR}/Menu.cpp
     ${SOURCE_DIR}/PathManager.cpp
     ${SOURCE_DIR}/SceneBase.cpp
     ${SOURCE_DIR}/SceneManager.cpp
@@ -35,6 +37,7 @@ set(SOURCES
 set(HEADERS
     ${HEADER_DIR}/Animation.h
     ${HEADER_DIR}/Arrow.h
+    ${HEADER_DIR}/AudioManager.h
     ${HEADER_DIR}/Bullet.h
     ${HEADER_DIR}/Camera.h
     ${HEADER_DIR}/Collision.h
@@ -52,6 +55,7 @@ set(HEADERS
     ${HEADER_DIR}/IGameObject.h
     ${HEADER_DIR}/Projectile.h
     ${HEADER_DIR}/Map.h
+    ${HEADER_DIR}/Menu.h
     ${HEADER_DIR}/PathManager.h
     ${HEADER_DIR}/SceneBase.h
     ${HEADER_DIR}/SceneManager.h

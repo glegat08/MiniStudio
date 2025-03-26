@@ -2,8 +2,10 @@
 
 #include <iostream>
 
+#include "AudioManager.h"
 #include "Composite.h"
 #include "Hero.h"
+#include "Map.h"
 #include "PathManager.h"
 #include "TextureManager.h"
 
@@ -165,6 +167,9 @@ void PlayerController::update(const float& deltaTime)
     {
         sf::Vector2f currentPos = square_renderer->getPosition();
         sf::Vector2f newPos = currentPos + m_velocity * deltaTime;
+
+        float player_radius = 25.f;
+		newPos = WorldLimits::limits(newPos, player_radius);
         square_renderer->setPosition(newPos);
     }
 }
@@ -202,4 +207,73 @@ bool PlayerController::isMovingLeft() const
 bool PlayerController::isMovingRight() const
 {
     return m_isMovingRight;
+}
+
+
+
+SoundComponent::SoundComponent(const std::string& name)
+    : Component(name)
+{
+}
+
+void SoundComponent::initialize()
+{
+    Component::initialize();
+}
+
+void SoundComponent::playSound(const std::string& soundName, float volume, float pitch)
+{
+    SoundManager::getInstance().playSound(soundName, volume, pitch);
+}
+
+void SoundComponent::stopSound(const std::string& soundName)
+{
+    SoundManager::getInstance().stopSound(soundName);
+}
+
+void SoundComponent::stopAllSounds()
+{
+    for (const auto& mapping : m_soundMappings)
+    {
+        stopSound(mapping.second);
+    }
+}
+
+void SoundComponent::addSoundMapping(const std::string& actionName, const std::string& soundName)
+{
+    m_soundMappings[actionName] = soundName;
+}
+
+void SoundComponent::removeSoundMapping(const std::string& actionName)
+{
+    auto it = m_soundMappings.find(actionName);
+    if (it != m_soundMappings.end())
+    {
+        m_soundMappings.erase(it);
+    }
+}
+
+bool SoundComponent::hasMapping(const std::string& actionName) const
+{
+    return m_soundMappings.find(actionName) != m_soundMappings.end();
+}
+
+void SoundComponent::playAction(const std::string& actionName, float volume, float pitch)
+{
+    if (hasMapping(actionName))
+    {
+        playSound(m_soundMappings[actionName], volume, pitch);
+    }
+    else
+    {
+        std::cerr << "No sound mapping found for action: " << actionName << std::endl;
+    }
+}
+
+void SoundComponent::stopAction(const std::string& actionName)
+{
+    if (hasMapping(actionName))
+    {
+        stopSound(m_soundMappings[actionName]);
+    }
 }

@@ -1,5 +1,6 @@
 #include "SceneManager.h"
 #include "Game.h"
+#include "Menu.h"
 #include <iostream>
 
 enum SceneStat
@@ -13,18 +14,22 @@ enum SceneStat
 SceneManager::SceneManager(const int& width, const int& height, const std::string& title)
     : m_window(std::make_unique<sf::RenderWindow>(sf::VideoMode(width, height), title, sf::Style::Fullscreen))
 {
-	m_rootScene = std::make_unique<SceneBase>(m_window.get(), 60.f, "Root");
+    m_rootScene = std::make_unique<SceneBase>(m_window.get(), 60.f, "Root");
 
-	auto gameScene = std::make_unique<Game>(m_window.get(), 60.f);
+    auto mainMenuScene = std::make_unique<MainMenu>(m_window.get(), 60.f, this);
+    auto gameScene = std::make_unique<Game>(m_window.get(), 60.f);
+    auto pauseScene = std::make_unique<PauseMenu>(m_window.get(), 60.f, this);
 
-	m_currentScene = gameScene.get();
+    m_currentScene = mainMenuScene.get();
 
-	m_rootScene->addChild(std::move(gameScene));
+    m_rootScene->addChild(std::move(mainMenuScene));
+    m_rootScene->addChild(std::move(gameScene));
+    m_rootScene->addChild(std::move(pauseScene));
 }
 
 void SceneManager::addScene(std::unique_ptr<SceneBase> scene)
 {
-	m_rootScene->addChild(std::move(scene));
+    m_rootScene->addChild(std::move(scene));
 }
 
 sf::RenderWindow* SceneManager::getWindow()
@@ -41,7 +46,12 @@ void SceneManager::setCurrentScene(const std::string& name)
 {
     SceneBase* scene = m_rootScene->getChild(name);
     if (scene)
-		m_currentScene = scene;
+        m_currentScene = scene;
+}
+
+SceneBase* SceneManager::getChild(const std::string& name)
+{
+    return m_rootScene->getChild(name);
 }
 
 void SceneManager::processInput()
@@ -55,16 +65,13 @@ void SceneManager::processInput()
 
         if (event.type == sf::Event::KeyPressed)
         {
-            if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+            if (event.key.code == sf::Keyboard::P)
             {
-				if (m_currentScene->getName() == "Game")
-					setCurrentScene("Pause");
-				else if (m_currentScene->getName() == "Pause")
-					setCurrentScene("Game");
+                if (m_currentScene->getName() == "Game")
+                    setCurrentScene("Pause");
+                else if (m_currentScene->getName() != "MainMenu" && m_currentScene->getName() != "Pause")
+                    setCurrentScene("Pause");
             }
-
-            if (event.key.code == sf::Keyboard::Escape)
-                m_window->close();
         }
 
         m_currentScene->processInput(event);

@@ -4,6 +4,7 @@
 #include <random>
 
 #include "Animation.h"
+#include "AudioManager.h"
 #include "Collision.h"
 #include "Effect.h"
 #include "Enemy.h"
@@ -399,6 +400,8 @@ void IEnemy::takeDamage(int amount, const sf::Vector2f& attackerPos)
 
     auto animation_component = static_cast<AnimationComponent*>(getComponent("AnimationComponent"));
 
+    SoundManager::getInstance().playSound("hit", 80.f);
+
     if (m_health <= 0)
     {
         m_isDead = true;
@@ -406,6 +409,8 @@ void IEnemy::takeDamage(int amount, const sf::Vector2f& attackerPos)
         if (animation_component)
             animation_component->playAnimation("death");
 
+        SoundManager::getInstance().playSound("death", 40.f);
+		
         std::cout << getName() << " has been defeated!" << std::endl;
 
         auto hitbox = static_cast<Hitbox*>(getComponent("Hitbox"));
